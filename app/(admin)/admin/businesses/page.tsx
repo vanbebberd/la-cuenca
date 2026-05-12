@@ -40,7 +40,7 @@ export default async function AdminBusinessesPage() {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-50">
-            {businesses.map((b) => (
+            {businesses.map((b: (typeof businesses)[number]) => (
               <tr key={b.id} className="hover:bg-gray-50 transition-colors">
                 <td className="px-4 py-3">
                   <div className="font-medium text-gray-900">{b.name}</div>
