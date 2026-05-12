@@ -70,7 +70,7 @@ export default async function AdminDashboard() {
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
-              {recentBusinesses.map((b) => (
+              {recentBusinesses.map((b: (typeof recentBusinesses)[number]) => (
                 <div key={b.id} className="flex items-center justify-between">
                   <div>
                     <p className="text-sm font-medium text-gray-800">{b.name}</p>
@@ -92,7 +92,7 @@ export default async function AdminDashboard() {
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
-              {recentReviews.map((r) => (
+              {recentReviews.map((r: (typeof recentReviews)[number]) => (
                 <div key={r.id} className="flex items-start justify-between gap-2">
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-gray-800">{r.business.name}</p>

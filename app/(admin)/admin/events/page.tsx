@@ -43,7 +43,7 @@ export default async function AdminEventsPage() {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-50">
-            {events.map((e) => {
+            {events.map((e: (typeof events)[number]) => {
               const totalSold = e.ticketTypes.reduce((s, t) => s + t.sold, 0);
               const totalCapacity = e.ticketTypes.reduce((s, t) => s + t.capacity, 0);
               return (

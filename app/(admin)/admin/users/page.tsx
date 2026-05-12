@@ -29,7 +29,7 @@ export default async function AdminUsersPage() {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-50">
-            {users.map((u) => (
+            {users.map((u: (typeof users)[number]) => (
               <tr key={u.id} className="hover:bg-gray-50">
                 <td className="px-4 py-3 text-gray-800 font-mono text-xs">{u.email}</td>
                 <td className="px-4 py-3 text-gray-600 hidden md:table-cell">{u.name ?? "—"}</td>

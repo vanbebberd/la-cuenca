@@ -94,7 +94,7 @@ export function TicketPurchase({ event, ticketTypes }: Props) {
       </h2>
 
       <div className="space-y-3">
-        {ticketTypes.map((t) => {
+        {ticketTypes.map((t: (typeof ticketTypes)[number]) => {
           const available = t.capacity - t.sold;
           const qty = quantities[t.id] ?? 0;
           return (

@@ -107,7 +107,7 @@ export function ReviewSection({ businessId, reviews: initial, avgRating, reviewC
           {reviews.length === 0 ? (
             <p className="text-sm text-gray-400 text-center py-4">Sé el primero en reseñar este lugar</p>
           ) : (
-            reviews.map((r) => (
+            reviews.map((r: (typeof reviews)[number]) => (
               <div key={r.id} className="border-t border-gray-50 pt-4 first:border-0 first:pt-0">
                 <div className="flex items-center gap-2 mb-1">
                   <div className="w-7 h-7 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-700 font-semibold text-xs shrink-0">

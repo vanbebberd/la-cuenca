@@ -88,7 +88,7 @@ export default async function AdminPointsPage() {
               <p className="text-sm text-gray-400 py-4 text-center">No hay campañas</p>
             ) : (
               <div className="space-y-3">
-                {campaigns.map((c) => (
+                {campaigns.map((c: (typeof campaigns)[number]) => (
                   <div key={c.id} className="flex items-center justify-between">
                     <div>
                       <p className="text-sm font-medium text-gray-800">{c.name}</p>
