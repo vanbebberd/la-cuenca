@@ -35,7 +35,7 @@ export function TicketPurchase({ event, ticketTypes }: Props) {
     });
   }
 
-  const total = ticketTypes.reduce((s, t) => s + (quantities[t.id] ?? 0) * t.price, 0);
+  const total = ticketTypes.reduce((s: number, t) => s + (quantities[t.id] ?? 0) * t.price, 0);
   const hasItems = Object.values(quantities).some((q) => q > 0);
 
   async function handlePurchase() {

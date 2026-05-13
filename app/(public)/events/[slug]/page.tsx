@@ -66,7 +66,7 @@ export default async function EventPage({ params }: Props) {
                 <div className="flex items-center gap-2 text-gray-600">
                   <Users className="h-4 w-4 text-emerald-600" />
                   <span className="text-sm">
-                    {event.ticketTypes.reduce((s, t) => s + (t.capacity - t.sold), 0)} entradas disponibles
+                    {event.ticketTypes.reduce((s: number, t) => s + (t.capacity - t.sold), 0)} entradas disponibles
                   </span>
                 </div>
               )}

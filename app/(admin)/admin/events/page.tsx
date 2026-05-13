@@ -44,8 +44,8 @@ export default async function AdminEventsPage() {
           </thead>
           <tbody className="divide-y divide-gray-50">
             {events.map((e: (typeof events)[number]) => {
-              const totalSold = e.ticketTypes.reduce((s, t) => s + t.sold, 0);
-              const totalCapacity = e.ticketTypes.reduce((s, t) => s + t.capacity, 0);
+              const totalSold = e.ticketTypes.reduce((s: number, t) => s + t.sold, 0);
+              const totalCapacity = e.ticketTypes.reduce((s: number, t) => s + t.capacity, 0);
               return (
                 <tr key={e.id} className="hover:bg-gray-50 transition-colors">
                   <td className="px-4 py-3">
