@@ -44,6 +44,10 @@ export async function POST(req: NextRequest) {
     .map((b) => `- ${b.name} (${b.category.name}${b.priceRange ? `, precio: ${b.priceRange}` : ""}${b.avgRating > 0 ? `, rating: ${b.avgRating.toFixed(1)}⭐` : ""})`)
     .join("\n");
 
+  if (!process.env.ANTHROPIC_API_KEY) {
+    return NextResponse.json({ error: "ANTHROPIC_API_KEY no configurada" }, { status: 500 });
+  }
+
   const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
   const systemPrompt = `Eres un experto local de la cuenca del Lago Llanquihue en Chile. Armas itinerarios personalizados y auténticos usando los locales reales que te proporcionan.
@@ -76,12 +80,18 @@ Usa SOLO los locales de la lista. Si no hay suficientes, menciona actividades ge
 Locales disponibles en ${cityName}:
 ${businessList || "No hay locales registrados aún, usa lugares conocidos de la zona."}`;
 
-  const message = await client.messages.create({
-    model: "claude-haiku-4-5-20251001",
-    max_tokens: 1500,
-    system: systemPrompt,
-    messages: [{ role: "user", content: userPrompt }],
-  });
+  let message;
+  try {
+    message = await client.messages.create({
+      model: "claude-haiku-4-5-20251001",
+      max_tokens: 1500,
+      system: systemPrompt,
+      messages: [{ role: "user", content: userPrompt }],
+    });
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : "Error al llamar a Claude";
+    return NextResponse.json({ error: msg }, { status: 500 });
+  }
 
   const text = message.content[0].type === "text" ? message.content[0].text : "";
 
