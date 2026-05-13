@@ -14,6 +14,7 @@ const schema = z.object({
 });
 
 export async function POST(req: NextRequest) {
+  try {
   const body = await req.json();
   const parsed = schema.safeParse(body);
   if (!parsed.success) return NextResponse.json({ error: "Datos inválidos" }, { status: 400 });
@@ -120,4 +121,9 @@ ${businessList || "No hay locales registrados aún, usa lugares conocidos de la 
   }
 
   return NextResponse.json({ ...panorama, businessLinks });
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : "Error interno del servidor";
+    console.error("[panorama]", msg);
+    return NextResponse.json({ error: msg }, { status: 500 });
+  }
 }
