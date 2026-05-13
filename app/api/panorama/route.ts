@@ -3,6 +3,8 @@ import Anthropic from "@anthropic-ai/sdk";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 
+export const maxDuration = 60;
+
 const schema = z.object({
   ciudad: z.string(),
   tipo: z.string(),

@@ -65,11 +65,12 @@ export default function PanoramaPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ciudad, tipo, presupuesto, duracion, intereses }),
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error ?? "Error generando panorama");
+      let data: { error?: string } & Panorama | null = null;
+      try { data = await res.json(); } catch { /* non-json response */ }
+      if (!res.ok || !data) throw new Error(data?.error ?? `Error del servidor (${res.status})`);
       setPanorama(data);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "No pudimos generar el panorama. Intenta de nuevo.");
+      setError(err instanceof Error ? err.message : "Error desconocido");
     } finally {
       setLoading(false);
     }
