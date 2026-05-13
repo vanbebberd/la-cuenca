@@ -160,7 +160,7 @@ export default async function BusinessPage({ params }: Props) {
               <section className="bg-white rounded-2xl border border-gray-100 p-6">
                 <h2 className="text-base font-bold text-gray-900 mb-4">Galería de fotos</h2>
                 <div className="grid grid-cols-3 gap-2">
-                  {business.photos.slice(0, 6).map((photo, i) => (
+                  {business.photos.slice(0, 6).map((photo, i: number) => (
                     <div
                       key={photo.id}
                       className={`relative overflow-hidden rounded-xl bg-gray-100 ${i === 0 ? "col-span-2 row-span-2 aspect-square" : "aspect-square"}`}

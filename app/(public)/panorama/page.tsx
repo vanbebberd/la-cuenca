@@ -240,7 +240,7 @@ export default function PanoramaPage() {
                 <h3 className="font-semibold text-gray-900">Tu itinerario</h3>
               </div>
               <div className="divide-y divide-gray-50">
-                {panorama.items.map((item, i) => {
+                {panorama.items.map((item, i: number) => {
                   const slug = panorama.businessLinks?.[item.lugar.toLowerCase()];
                   return (
                     <div key={i} className="flex gap-4 p-5">
