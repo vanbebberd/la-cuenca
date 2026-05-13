@@ -21,12 +21,8 @@ export function Navbar() {
   return (
     <header className="sticky top-0 z-50 bg-white/98 backdrop-blur-md border-b border-gray-100 shadow-sm">
       <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
-        <Link href="/" className="flex items-center gap-2.5 shrink-0">
-          <Image src="/logo.png" alt="La Cuenca" width={32} height={32} className="rounded-lg" />
-          <div>
-            <span className="text-base font-black tracking-tight text-gray-900">La Cuenca</span>
-            <span className="hidden sm:block text-[10px] text-gray-400 font-normal leading-none">Lago Llanquihue</span>
-          </div>
+        <Link href="/" className="flex items-center shrink-0">
+          <Image src="/logo.png" alt="La Cuenca" width={120} height={40} className="h-9 w-auto object-contain" />
         </Link>
 
         {/* Desktop nav */}
