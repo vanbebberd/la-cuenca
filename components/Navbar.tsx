@@ -3,6 +3,7 @@ import Link from "next/link";
 import { useSession, signOut } from "next-auth/react";
 import { useState } from "react";
 import { Menu, X, MapPin, Ticket, Gift, LayoutDashboard, LogIn, Sparkles } from "lucide-react";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 
 const NAV_LINKS = [
@@ -21,9 +22,7 @@ export function Navbar() {
     <header className="sticky top-0 z-50 bg-white/98 backdrop-blur-md border-b border-gray-100 shadow-sm">
       <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
         <Link href="/" className="flex items-center gap-2.5 shrink-0">
-          <div className="w-8 h-8 rounded-lg bg-emerald-600 flex items-center justify-center">
-            <MapPin className="h-4 w-4 text-white" />
-          </div>
+          <Image src="/logo.png" alt="La Cuenca" width={32} height={32} className="rounded-lg" />
           <div>
             <span className="text-base font-black tracking-tight text-gray-900">La Cuenca</span>
             <span className="hidden sm:block text-[10px] text-gray-400 font-normal leading-none">Lago Llanquihue</span>
