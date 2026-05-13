@@ -68,7 +68,7 @@ export default function HomePage() {
             </Link>
           </div>
 
-          <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-6 gap-1">
+          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-1">
             {CATEGORIES.map((cat) => {
               const Icon = ICON_MAP[cat.icon] ?? Map;
               return (
@@ -100,7 +100,7 @@ export default function HomePage() {
                 href={`/directory?ciudad=${city.slug}`}
                 className="group flex flex-col items-center gap-3 flex-1"
               >
-                <div className="relative w-28 h-28 sm:w-32 sm:h-32 md:w-36 md:h-36 rounded-full overflow-hidden ring-2 ring-transparent group-hover:ring-emerald-400 transition-all duration-300 shadow-md group-hover:shadow-lg">
+                <div className="relative w-16 h-16 sm:w-24 sm:h-24 md:w-32 md:h-32 rounded-full overflow-hidden ring-2 ring-transparent group-hover:ring-emerald-400 transition-all duration-300 shadow-md group-hover:shadow-lg">
                   <Image
                     src={CITY_PHOTOS[city.slug] ?? "https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=400&q=80"}
                     alt={city.name}
