@@ -112,7 +112,7 @@ export default async function AdminPointsPage() {
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
-              {topUsers.map((u, i) => (
+              {topUsers.map((u: (typeof topUsers)[number], i) => (
                 <div key={u.id} className="flex items-center gap-3">
                   <span className="w-5 text-xs text-gray-400 font-bold">{i + 1}.</span>
                   <div className="flex-1 min-w-0">

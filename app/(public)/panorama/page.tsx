@@ -280,7 +280,7 @@ export default function PanoramaPage() {
               <div className="bg-emerald-50 border border-emerald-100 rounded-2xl p-5">
                 <h3 className="font-semibold text-emerald-900 mb-3 text-sm">Consejos locales</h3>
                 <ul className="space-y-2">
-                  {panorama.consejos.map((c, i) => (
+                  {panorama.consejos.map((c: string, i: number) => (
                     <li key={i} className="text-sm text-emerald-800 flex items-start gap-2">
                       <span className="text-emerald-400 mt-0.5">•</span> {c}
                     </li>

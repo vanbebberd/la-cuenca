@@ -111,9 +111,9 @@ function EventCard({
   featured?: boolean;
 }) {
   const minPrice = event.ticketTypes.length
-    ? Math.min(...event.ticketTypes.map((t) => t.price))
+    ? Math.min(...event.ticketTypes.map((t: (typeof event.ticketTypes)[number]) => t.price))
     : null;
-  const hasAvailability = event.ticketTypes.some((t) => t.sold < t.capacity);
+  const hasAvailability = event.ticketTypes.some((t: (typeof event.ticketTypes)[number]) => t.sold < t.capacity);
 
   return (
     <Link href={`/events/${event.slug}`} className="group block">

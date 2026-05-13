@@ -43,8 +43,8 @@ export function TicketPurchase({ event, ticketTypes }: Props) {
     setLoading(true);
     try {
       const items = ticketTypes
-        .filter((t) => (quantities[t.id] ?? 0) > 0)
-        .map((t) => ({ ticketTypeId: t.id, quantity: quantities[t.id] }));
+        .filter((t: (typeof ticketTypes)[number]) => (quantities[t.id] ?? 0) > 0)
+        .map((t: (typeof ticketTypes)[number]) => ({ ticketTypeId: t.id, quantity: quantities[t.id] }));
 
       const res = await fetch("/api/tickets/purchase", {
         method: "POST",
