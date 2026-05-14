@@ -3,6 +3,8 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { v2 as cloudinary } from "cloudinary";
 
+export const runtime = "nodejs";
+
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,
@@ -16,23 +18,22 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "No autorizado" }, { status: 403 });
   }
 
-  const formData = await req.formData();
-  const file = formData.get("file") as File | null;
-  if (!file) return NextResponse.json({ error: "No se recibió archivo" }, { status: 400 });
-
-  const bytes = await file.arrayBuffer();
-  const buffer = Buffer.from(bytes);
-
   try {
-    const result = await new Promise<{ secure_url: string }>((resolve, reject) => {
-      cloudinary.uploader.upload_stream(
-        { folder: "lacuenca", resource_type: "image", quality: "auto", fetch_format: "auto" },
-        (error, result) => {
-          if (error || !result) reject(error ?? new Error("Upload failed"));
-          else resolve(result as { secure_url: string });
-        }
-      ).end(buffer);
+    const formData = await req.formData();
+    const file = formData.get("file") as File | null;
+    if (!file) return NextResponse.json({ error: "No se recibió archivo" }, { status: 400 });
+
+    const bytes = await file.arrayBuffer();
+    const base64 = Buffer.from(bytes).toString("base64");
+    const dataUri = `data:${file.type};base64,${base64}`;
+
+    const result = await cloudinary.uploader.upload(dataUri, {
+      folder: "lacuenca",
+      resource_type: "image",
+      quality: "auto",
+      fetch_format: "auto",
     });
+
     return NextResponse.json({ url: result.secure_url });
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
