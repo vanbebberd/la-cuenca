@@ -15,17 +15,22 @@ export const authOptions: NextAuthOptions = {
       },
       async authorize(credentials) {
         if (!credentials?.email) return null;
-        // Find or create user — anyone can log in with just their email
-        const user = await prisma.user.upsert({
-          where: { email: credentials.email },
-          update: {},
-          create: {
-            email: credentials.email,
-            name: credentials.email.split("@")[0],
-            role: "USER",
-          },
-        });
-        return user;
+        try {
+          const isAdmin = !!process.env.ADMIN_EMAIL && process.env.ADMIN_EMAIL === credentials.email;
+          const user = await prisma.user.upsert({
+            where: { email: credentials.email },
+            update: isAdmin ? { role: "ADMIN" } : {},
+            create: {
+              email: credentials.email,
+              name: credentials.email.split("@")[0],
+              role: isAdmin ? "ADMIN" : "USER",
+            },
+          });
+          return { id: user.id, email: user.email, name: user.name, image: user.image, role: user.role };
+        } catch (e) {
+          console.error("[auth] authorize error:", e);
+          return null;
+        }
       },
     }),
 
@@ -47,12 +52,8 @@ export const authOptions: NextAuthOptions = {
     },
     async jwt({ token, user }) {
       if (user) {
+        // On sign-in, role comes fresh from the upsert in authorize()
         token.role = (user as { role?: string }).role;
-      }
-      // Refrescar rol desde DB en cada request
-      if (token.sub && !token.role) {
-        const dbUser = await prisma.user.findUnique({ where: { id: token.sub } });
-        token.role = dbUser?.role;
       }
       return token;
     },
