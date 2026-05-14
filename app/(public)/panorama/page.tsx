@@ -43,6 +43,7 @@ interface Panorama {
   items: PanoramaItem[];
   consejos: string[];
   businessLinks: Record<string, string>;
+  businessCoords: Record<string, { lat: number; lng: number }>;
 }
 
 export default function PanoramaPage() {
@@ -258,6 +259,46 @@ export default function PanoramaPage() {
               <h2 className="text-2xl font-black mb-2">{panorama.titulo}</h2>
               <p className="text-white/60 text-sm leading-relaxed">{panorama.descripcion}</p>
             </div>
+
+            {/* Mapa y ruta */}
+            {(() => {
+              const routePoints = panorama.items
+                .map((item) => panorama.businessCoords?.[item.lugar.toLowerCase()])
+                .filter(Boolean) as { lat: number; lng: number }[];
+              const mapsUrl = routePoints.length >= 2
+                ? `https://www.google.com/maps/dir/${routePoints.map((p) => `${p.lat},${p.lng}`).join("/")}`
+                : routePoints.length === 1
+                ? `https://www.google.com/maps/search/?api=1&query=${routePoints[0].lat},${routePoints[0].lng}`
+                : null;
+              const embedCenter = routePoints[0] ?? null;
+
+              if (!mapsUrl) return null;
+              return (
+                <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
+                  {embedCenter && (
+                    <div className="h-48">
+                      <iframe
+                        src={`https://maps.google.com/maps?q=${embedCenter.lat},${embedCenter.lng}&z=14&output=embed`}
+                        width="100%"
+                        height="100%"
+                        style={{ border: 0 }}
+                        loading="lazy"
+                        referrerPolicy="no-referrer-when-downgrade"
+                        title="Mapa del itinerario"
+                      />
+                    </div>
+                  )}
+                  <div className="p-4">
+                    <a href={mapsUrl} target="_blank" rel="noopener noreferrer">
+                      <button className="w-full flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold py-3 px-4 rounded-xl transition-colors">
+                        <MapPin className="h-4 w-4" />
+                        {routePoints.length >= 2 ? `Ver ruta completa (${routePoints.length} paradas)` : "Ver en Google Maps"}
+                      </button>
+                    </a>
+                  </div>
+                </div>
+              );
+            })()}
 
             <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
               <div className="px-5 py-4 border-b border-gray-100">

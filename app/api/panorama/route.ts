@@ -113,16 +113,19 @@ ${businessList || "No hay locales registrados aún, usa lugares conocidos de la 
           status: "ACTIVE",
           name: { in: placesInPanorama, mode: "insensitive" },
         },
-        select: { name: true, slug: true },
+        select: { name: true, slug: true, lat: true, lng: true },
       })
     : [];
 
   const businessLinks: Record<string, string> = {};
+  const businessCoords: Record<string, { lat: number; lng: number }> = {};
   for (const b of matchedBusinesses) {
-    businessLinks[b.name.toLowerCase()] = b.slug;
+    const key = b.name.toLowerCase();
+    businessLinks[key] = b.slug;
+    if (b.lat && b.lng) businessCoords[key] = { lat: b.lat, lng: b.lng };
   }
 
-  return NextResponse.json({ ...panorama, businessLinks });
+  return NextResponse.json({ ...panorama, businessLinks, businessCoords });
   } catch (err) {
     const msg = err instanceof Error ? err.message : "Error interno del servidor";
     console.error("[panorama]", msg);
