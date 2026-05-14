@@ -71,11 +71,11 @@ export default function AdminCitiesPage() {
       const fd = new FormData();
       fd.append("file", file);
       const res = await fetch("/api/admin/upload", { method: "POST", body: fd });
-      if (!res.ok) throw new Error();
-      const { url } = await res.json();
-      setEditImage(url);
-    } catch {
-      alert("Error subiendo la imagen");
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error ?? `HTTP ${res.status}`);
+      setEditImage(data.url);
+    } catch (err) {
+      alert("Error: " + (err instanceof Error ? err.message : String(err)));
     } finally {
       setUploading(false);
       if (fileInputRef.current) fileInputRef.current.value = "";
