@@ -68,7 +68,7 @@ export default async function BusinessPage({ params }: Props) {
         {/* Breadcrumb over image */}
         <div className="absolute top-4 left-4 right-4">
           <nav className="flex items-center gap-1.5 text-xs text-white/80">
-            <Link href="/directory" className="hover:text-white transition-colors">Directorio</Link>
+            <Link href="/directory" className="hover:text-white transition-colors">Explorar</Link>
             <ChevronRight className="h-3 w-3 opacity-50" />
             <Link href={`/directory?ciudad=${business.city.slug}`} className="hover:text-white transition-colors">{business.city.name}</Link>
             <ChevronRight className="h-3 w-3 opacity-50" />

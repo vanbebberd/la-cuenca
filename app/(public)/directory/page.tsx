@@ -5,7 +5,7 @@ import Link from "next/link";
 import { Search, SlidersHorizontal, X } from "lucide-react";
 import type { Metadata } from "next";
 
-export const metadata: Metadata = { title: "Directorio" };
+export const metadata: Metadata = { title: "Explorar" };
 
 interface DirectoryPageProps {
   searchParams: Promise<{ ciudad?: string; categoria?: string; precio?: string; q?: string }>;
@@ -46,7 +46,7 @@ export default async function DirectoryPage({ searchParams }: DirectoryPageProps
       <div className="bg-white border-b border-gray-100">
         <div className="max-w-7xl mx-auto px-4 py-6">
           <h1 className="text-2xl font-bold text-gray-900">
-            {activeCat ? activeCat.name : activeCity ? `Directorio — ${activeCity.name}` : "Directorio completo"}
+            {activeCat ? activeCat.name : activeCity ? `Explorar — ${activeCity.name}` : "Explorar todo"}
           </h1>
           <div className="flex items-center gap-3 mt-2 flex-wrap">
             <p className="text-sm text-gray-500">
@@ -162,7 +162,7 @@ export default async function DirectoryPage({ searchParams }: DirectoryPageProps
                 <p className="text-lg font-semibold text-gray-800 mb-1">Sin resultados</p>
                 <p className="text-gray-400 text-sm mb-4">No encontramos locales con esos filtros.</p>
                 <Link href="/directory" className="text-sm text-emerald-600 font-medium hover:underline">
-                  Ver todo el directorio
+                  Ver todo
                 </Link>
               </div>
             ) : (

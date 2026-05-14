@@ -7,7 +7,7 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 
 const NAV_LINKS = [
-  { href: "/directory", label: "Directorio", icon: MapPin },
+  { href: "/directory", label: "Explorar", icon: MapPin },
   { href: "/panorama", label: "Laki", icon: Sparkles },
   { href: "/events", label: "Eventos", icon: Ticket },
   { href: "/wallet", label: "Mis Puntos", icon: Gift },
