@@ -24,8 +24,8 @@ export function HeroSearch() {
   return (
     <div className="w-full max-w-2xl mx-auto">
       <form onSubmit={handleSearch}>
-        <div className="bg-white rounded-2xl shadow-2xl overflow-hidden">
-          <div className="flex flex-col sm:flex-row">
+        <div className="bg-white rounded-2xl shadow-2xl">
+          <div className="flex flex-col sm:flex-row overflow-hidden rounded-2xl">
             {/* What */}
             <div className="flex items-center gap-3 px-5 py-4 flex-1 border-b sm:border-b-0 sm:border-r border-gray-100">
               <Search className="h-5 w-5 text-gray-400 shrink-0" />

@@ -153,7 +153,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── PANORAMA IA ──────────────────────────────────────────────────── */}
+      {/* ── LAKI ─────────────────────────────────────────────────────────── */}
       <section className="relative overflow-hidden bg-gray-950 py-24">
         <div className="absolute inset-0 opacity-15">
           <Image
@@ -163,7 +163,6 @@ export default function HomePage() {
             className="object-cover"
           />
         </div>
-        {/* Decorative circles */}
         <div className="absolute -top-20 -right-20 w-96 h-96 rounded-full bg-emerald-600/10 blur-3xl" />
         <div className="absolute -bottom-20 -left-20 w-96 h-96 rounded-full bg-amber-400/10 blur-3xl" />
 
@@ -171,20 +170,20 @@ export default function HomePage() {
           <div className="flex-1 text-white">
             <div className="inline-flex items-center gap-2 bg-amber-400/15 border border-amber-400/30 rounded-full px-4 py-1.5 text-xs font-bold text-amber-400 uppercase tracking-widest mb-6">
               <Sparkles className="h-3.5 w-3.5" />
-              Inteligencia Artificial
+              Laki — Tu asistente local
             </div>
             <h2 className="text-5xl sm:text-6xl font-black mb-6 leading-[0.95]">
               Tu panorama<br />
               <span className="text-amber-400">perfecto</span>
             </h2>
             <p className="text-white/50 text-lg leading-relaxed max-w-sm mb-8">
-              Dile a nuestra IA con quién vas, qué te gusta y cuánto tiempo tienes. Recibe un itinerario con lugares reales de la zona.
+              Pregúntale a Laki qué hacer hoy. Cuéntale con quién vas, el clima y cuánto tiempo tienes — arma un itinerario con lugares reales de la zona.
             </p>
             <div className="flex flex-col sm:flex-row gap-3">
               <Link href="/panorama">
                 <Button variant="amber" size="lg" className="gap-2 px-8 font-bold">
                   <Sparkles className="h-5 w-5" />
-                  Armar mi panorama
+                  Preguntarle a Laki
                 </Button>
               </Link>
             </div>
@@ -207,7 +206,7 @@ export default function HomePage() {
                   <p className="text-xs text-white/40">Puerto Varas — Día completo</p>
                 </div>
                 <div className="ml-auto">
-                  <span className="text-xs bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded-full font-medium">IA</span>
+                  <span className="text-xs bg-amber-400/20 text-amber-400 border border-amber-400/30 px-2 py-0.5 rounded-full font-medium">Laki</span>
                 </div>
               </div>
               <div className="space-y-3">

@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { Sparkles, MapPin, Clock, ChevronRight, RotateCcw, Share2, ExternalLink } from "lucide-react";
+import { Sparkles, MapPin, Clock, ChevronRight, RotateCcw, Share2, ExternalLink, Cloud, Sun, CloudRain } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { CITIES, CATEGORIES } from "@/lib/constants";
@@ -20,6 +20,14 @@ const DURACIONES = [
   { value: "mañana", label: "🌅 Solo la mañana" },
   { value: "tarde", label: "🌇 Solo la tarde" },
   { value: "dia_completo", label: "☀️ Día completo" },
+];
+const CLIMAS = [
+  { value: "soleado", label: "☀️ Soleado", icon: Sun },
+  { value: "parcial", label: "⛅ Parcialmente nublado", icon: Cloud },
+  { value: "lluvioso", label: "🌧️ Lluvioso", icon: CloudRain },
+];
+const EXTRA_INTERESES = [
+  { slug: "deportes", name: "🏄 Deportes" },
 ];
 
 interface PanoramaItem {
@@ -42,6 +50,7 @@ export default function PanoramaPage() {
   const [tipo, setTipo] = useState("");
   const [presupuesto, setPresupuesto] = useState("");
   const [duracion, setDuracion] = useState("");
+  const [clima, setClima] = useState("");
   const [intereses, setIntereses] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [panorama, setPanorama] = useState<Panorama | null>(null);
@@ -63,7 +72,7 @@ export default function PanoramaPage() {
       const res = await fetch("/api/panorama", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ciudad, tipo, presupuesto, duracion, intereses }),
+        body: JSON.stringify({ ciudad, tipo, presupuesto, duracion, clima, intereses }),
       });
       let data: { error?: string } & Panorama | null = null;
       try { data = await res.json(); } catch { /* non-json response */ }
@@ -76,6 +85,8 @@ export default function PanoramaPage() {
     }
   }
 
+  const allIntereses = [...CATEGORIES, ...EXTRA_INTERESES];
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
@@ -83,11 +94,11 @@ export default function PanoramaPage() {
         <div className="max-w-3xl mx-auto px-4 text-center">
           <div className="inline-flex items-center gap-2 bg-amber-400/10 border border-amber-400/20 rounded-full px-4 py-1.5 text-sm font-medium text-amber-400 mb-4">
             <Sparkles className="h-3.5 w-3.5" />
-            Armador de panoramas con IA
+            Laki — Tu asistente de la cuenca
           </div>
-          <h1 className="text-3xl sm:text-4xl font-black mb-3">¿Qué tipo de día buscas?</h1>
+          <h1 className="text-3xl sm:text-4xl font-black mb-3">¿Qué panorama buscas hoy?</h1>
           <p className="text-white/50 text-sm max-w-sm mx-auto">
-            Cuéntanos qué quieres y nuestra IA arma un itinerario con lugares reales de la zona.
+            Cuéntale a Laki qué quieres y arma un itinerario con lugares reales de la zona.
           </p>
         </div>
       </div>
@@ -113,6 +124,26 @@ export default function PanoramaPage() {
                     }`}
                   >
                     {c.name}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Clima */}
+            <div>
+              <p className="text-sm font-semibold text-gray-700 mb-3">¿Cómo está el clima? <span className="text-gray-400 font-normal">(opcional)</span></p>
+              <div className="flex flex-wrap gap-2">
+                {CLIMAS.map((cl) => (
+                  <button
+                    key={cl.value}
+                    onClick={() => setClima(prev => prev === cl.value ? "" : cl.value)}
+                    className={`px-4 py-2 rounded-xl border text-sm font-medium transition-all ${
+                      clima === cl.value
+                        ? "bg-gray-900 text-white border-gray-900"
+                        : "bg-white border-gray-200 text-gray-700 hover:border-gray-400"
+                    }`}
+                  >
+                    {cl.label}
                   </button>
                 ))}
               </div>
@@ -180,12 +211,12 @@ export default function PanoramaPage() {
               </div>
             </div>
 
-            {/* Intereses (opcional) */}
+            {/* Intereses */}
             <div>
               <p className="text-sm font-semibold text-gray-700 mb-1">¿Qué te interesa? <span className="text-gray-400 font-normal">(opcional)</span></p>
               <p className="text-xs text-gray-400 mb-3">Puedes elegir varios</p>
               <div className="flex flex-wrap gap-2">
-                {CATEGORIES.map((cat) => (
+                {allIntereses.map((cat) => (
                   <button
                     key={cat.slug}
                     onClick={() => toggleInteres(cat.slug)}
@@ -203,39 +234,31 @@ export default function PanoramaPage() {
 
             {error && <p className="text-sm text-red-500">{error}</p>}
 
-            <Button
-              onClick={handleGenerar}
-              disabled={loading}
-              size="lg"
-              className="w-full"
-            >
+            <Button onClick={handleGenerar} disabled={loading} size="lg" className="w-full">
               {loading ? (
                 <>
                   <Sparkles className="h-4 w-4 animate-pulse" />
-                  Armando tu panorama...
+                  Laki está armando tu panorama...
                 </>
               ) : (
                 <>
                   <Sparkles className="h-4 w-4" />
-                  Armar mi panorama
+                  Preguntarle a Laki
                   <ChevronRight className="h-4 w-4 ml-auto" />
                 </>
               )}
             </Button>
           </>
         ) : (
-          /* ── RESULTADO ── */
           <div className="space-y-6 animate-in fade-in duration-500">
-            {/* Título */}
             <div className="bg-gray-900 text-white rounded-2xl p-6">
               <div className="flex items-center gap-2 text-amber-400 text-xs font-medium mb-2">
-                <Sparkles className="h-3.5 w-3.5" /> Panorama generado por IA
+                <Sparkles className="h-3.5 w-3.5" /> Panorama de Laki
               </div>
               <h2 className="text-2xl font-black mb-2">{panorama.titulo}</h2>
               <p className="text-white/60 text-sm leading-relaxed">{panorama.descripcion}</p>
             </div>
 
-            {/* Itinerario */}
             <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
               <div className="px-5 py-4 border-b border-gray-100">
                 <h3 className="font-semibold text-gray-900">Tu itinerario</h3>
@@ -276,7 +299,6 @@ export default function PanoramaPage() {
               </div>
             </div>
 
-            {/* Consejos */}
             {panorama.consejos?.length > 0 && (
               <div className="bg-emerald-50 border border-emerald-100 rounded-2xl p-5">
                 <h3 className="font-semibold text-emerald-900 mb-3 text-sm">Consejos locales</h3>
@@ -290,13 +312,8 @@ export default function PanoramaPage() {
               </div>
             )}
 
-            {/* Acciones */}
             <div className="flex gap-3">
-              <Button
-                variant="outline"
-                className="flex-1"
-                onClick={() => setPanorama(null)}
-              >
+              <Button variant="outline" className="flex-1" onClick={() => setPanorama(null)}>
                 <RotateCcw className="h-4 w-4" />
                 Nuevo panorama
               </Button>
