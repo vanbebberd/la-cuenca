@@ -4,6 +4,7 @@ export const CITIES = [
   { name: "Llanquihue", slug: "llanquihue", lat: -41.2469, lng: -73.0019 },
   { name: "Frutillar", slug: "frutillar", lat: -41.1269, lng: -73.0386 },
   { name: "Puerto Octay", slug: "puerto-octay", lat: -40.9628, lng: -72.9005 },
+  { name: "Cochamó", slug: "cochamo", lat: -41.4894, lng: -72.3167 },
 ] as const;
 
 export const CATEGORIES = [
