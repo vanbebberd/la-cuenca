@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Search, MapPin, ChevronDown, Sparkles } from "lucide-react";
+import { Search, MapPin, ChevronDown, Sparkles, Loader2 } from "lucide-react";
 import { CITIES, CATEGORIES } from "@/lib/constants";
 
 export function HeroSearch() {
@@ -9,11 +9,42 @@ export function HeroSearch() {
   const [q, setQ] = useState("");
   const [ciudad, setCiudad] = useState("");
   const [categoria, setCategoria] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  function handleSearch(e: React.FormEvent) {
+  async function handleSearch(e: React.FormEvent) {
     e.preventDefault();
+
+    // Si hay texto, dejar que Laki interprete la búsqueda
+    if (q.trim()) {
+      setLoading(true);
+      try {
+        const res = await fetch("/api/search", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ q }),
+        });
+        const filters = await res.json();
+        const params = new URLSearchParams();
+        if (filters.ciudad) params.set("ciudad", filters.ciudad);
+        if (filters.categoria) params.set("categoria", filters.categoria);
+        if (filters.priceRange) params.set("precio", filters.priceRange);
+        if (ciudad) params.set("ciudad", ciudad); // manual override
+        if (categoria) params.set("categoria", categoria);
+        params.set("q", q);
+        router.push(`/directory?${params.toString()}`);
+      } catch {
+        const params = new URLSearchParams({ q });
+        if (ciudad) params.set("ciudad", ciudad);
+        if (categoria) params.set("categoria", categoria);
+        router.push(`/directory?${params.toString()}`);
+      } finally {
+        setLoading(false);
+      }
+      return;
+    }
+
+    // Sin texto: filtros manuales normales
     const params = new URLSearchParams();
-    if (q) params.set("q", q);
     if (ciudad) params.set("ciudad", ciudad);
     if (categoria) params.set("categoria", categoria);
     router.push(`/directory${params.toString() ? `?${params}` : ""}`);
@@ -27,11 +58,14 @@ export function HeroSearch() {
         <div className="bg-white rounded-2xl shadow-2xl p-2 flex flex-col sm:flex-row gap-2">
           {/* What */}
           <div className="flex items-center gap-3 px-4 py-3 flex-1 bg-gray-50 rounded-xl">
-            <Search className="h-4 w-4 text-gray-400 shrink-0" />
+            {loading
+              ? <Loader2 className="h-4 w-4 text-emerald-500 shrink-0 animate-spin" />
+              : <Search className="h-4 w-4 text-gray-400 shrink-0" />
+            }
             <input
               value={q}
               onChange={e => setQ(e.target.value)}
-              placeholder="¿Qué estás buscando?"
+              placeholder="¿Qué buscas? Escríbelo como quieras..."
               className="flex-1 text-sm text-gray-800 placeholder:text-gray-400 outline-none bg-transparent"
             />
           </div>
@@ -67,17 +101,25 @@ export function HeroSearch() {
           {/* Button */}
           <button
             type="submit"
-            className="bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white px-6 py-3 rounded-xl text-sm font-bold transition-colors flex items-center justify-center gap-2 shrink-0"
+            disabled={loading}
+            className="bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 disabled:opacity-70 text-white px-6 py-3 rounded-xl text-sm font-bold transition-colors flex items-center justify-center gap-2 shrink-0"
           >
-            <Search className="h-4 w-4" />
-            <span>Buscar</span>
+            {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
+            <span>{loading ? "Buscando..." : "Buscar"}</span>
           </button>
         </div>
+
+        {/* Hint */}
+        {!q && (
+          <p className="text-xs text-white/40 text-center mt-2">
+            Prueba: <span className="text-white/60 italic">"algo romántico para cenar en Puerto Varas"</span>
+          </p>
+        )}
       </form>
 
       {/* Quick search chips */}
-      <div className="flex items-center gap-2 mt-4 flex-wrap justify-center">
-        <span className="text-xs text-white/50">Popular:</span>
+      <div className="flex items-center gap-2 mt-3 flex-wrap justify-center">
+        <span className="text-xs text-white/40">Popular:</span>
         {QUICK.map(label => {
           const cat = CATEGORIES.find(c => c.name === label);
           return (
