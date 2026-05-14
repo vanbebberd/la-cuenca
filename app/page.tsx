@@ -20,6 +20,14 @@ const ICON_MAP: Record<string, LucideIcon> = {
   Activity, ShoppingBag, Bike, GlassWater, Heart, Wrench, Camera,
 };
 
+const CITY_PHOTOS: Record<string, string> = {
+  "puerto-montt": "https://images.unsplash.com/photo-1553761984-30e1bfcb8bdb?w=600&q=80",
+  "puerto-varas": "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&q=80",
+  "llanquihue":   "https://images.unsplash.com/photo-1501854140801-50d01698950b?w=600&q=80",
+  "frutillar":    "https://images.unsplash.com/photo-1551632436-cbf8dd35adfa?w=600&q=80",
+  "puerto-octay": "https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=600&q=80",
+  "cochamo":      "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=600&q=80",
+};
 
 export default async function HomePage() {
   const featured = await prisma.business.findMany({
@@ -99,10 +107,21 @@ export default async function HomePage() {
               <Link
                 key={city.slug}
                 href={`/directory?ciudad=${city.slug}`}
-                className="group bg-white border border-gray-100 rounded-2xl px-4 py-5 flex flex-col items-center gap-2 hover:border-emerald-300 hover:shadow-sm transition-all duration-200"
+                className="group rounded-2xl overflow-hidden border border-gray-100 hover:border-emerald-300 hover:shadow-md transition-all duration-200 bg-white"
               >
-                <MapPin className="h-5 w-5 text-gray-300 group-hover:text-emerald-500 transition-colors" />
-                <span className="text-sm font-semibold text-gray-700 group-hover:text-emerald-700 transition-colors text-center leading-tight">{city.name}</span>
+                <div className="relative h-28 overflow-hidden">
+                  <Image
+                    src={CITY_PHOTOS[city.slug] ?? "https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=400&q=80"}
+                    alt={city.name}
+                    fill
+                    className="object-cover group-hover:scale-105 transition-transform duration-500"
+                    sizes="200px"
+                  />
+                  <div className="absolute inset-0 bg-black/25 group-hover:bg-black/0 transition-all duration-300" />
+                </div>
+                <div className="px-3 py-2.5">
+                  <p className="text-sm font-bold text-gray-800 group-hover:text-emerald-700 transition-colors">{city.name}</p>
+                </div>
               </Link>
             ))}
           </div>
