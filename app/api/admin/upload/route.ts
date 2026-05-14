@@ -36,7 +36,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ url: result.secure_url });
   } catch (err) {
-    const msg = err instanceof Error ? err.message : String(err);
+    const msg = err instanceof Error ? err.message : JSON.stringify(err);
     console.error("[upload] Cloudinary error:", msg);
     return NextResponse.json({ error: msg }, { status: 500 });
   }
