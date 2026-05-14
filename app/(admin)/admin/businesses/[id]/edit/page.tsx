@@ -29,7 +29,7 @@ export default function EditBusinessPage() {
     priceRange: "", address: "", phone: "", whatsapp: "", email: "",
     website: "", instagram: "", facebook: "", menuUrl: "",
     lat: "", lng: "", pointsEnabled: false, pointsPerPeso: "0.01",
-    coverImage: "", status: "ACTIVE",
+    coverImage: "", status: "ACTIVE", featured: false,
   });
 
   useEffect(() => {
@@ -62,6 +62,7 @@ export default function EditBusinessPage() {
         pointsPerPeso: business.pointsPerPeso?.toString() ?? "0.01",
         coverImage: business.coverImage ?? "",
         status: business.status ?? "ACTIVE",
+        featured: business.featured ?? false,
       });
     }).catch(() => setError("Error cargando local")).finally(() => setLoading(false));
   }, [id]);
@@ -273,6 +274,17 @@ export default function EditBusinessPage() {
               <Input name="pointsPerPeso" type="number" step="0.001" value={form.pointsPerPeso} onChange={handleChange} />
             </div>
           )}
+        </div>
+
+        {/* Destacado */}
+        <div className="border-t border-gray-100 pt-4">
+          <label className="flex items-center gap-3 cursor-pointer group">
+            <input type="checkbox" name="featured" checked={form.featured} onChange={handleChange} className="rounded w-4 h-4 accent-emerald-600" />
+            <div>
+              <span className="text-sm font-medium text-gray-800">⭐ Destacar en el inicio</span>
+              <p className="text-xs text-gray-400">Aparece en la sección de recomendados de la página principal</p>
+            </div>
+          </label>
         </div>
 
         {error && <p className="text-sm text-red-500">{error}</p>}

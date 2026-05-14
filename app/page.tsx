@@ -10,6 +10,8 @@ import { type LucideIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CITIES, CATEGORIES } from "@/lib/constants";
 import { HeroSearch } from "@/components/HeroSearch";
+import { prisma } from "@/lib/prisma";
+import { BusinessCard } from "@/components/BusinessCard";
 
 const ICON_MAP: Record<string, LucideIcon> = {
   UtensilsCrossed, Coffee, BedDouble, Beer, Map,
@@ -24,7 +26,14 @@ const CITY_PHOTOS: Record<string, string> = {
   "puerto-octay": "https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=600&q=80",
 };
 
-export default function HomePage() {
+export default async function HomePage() {
+  const featured = await prisma.business.findMany({
+    where: { featured: true, status: "ACTIVE" },
+    include: { city: true, category: true },
+    orderBy: { avgRating: "desc" },
+    take: 8,
+  });
+
   return (
     <div className="min-h-screen bg-white">
 
@@ -115,6 +124,28 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* ── RECOMENDADOS ─────────────────────────────────────────────────── */}
+      {featured.length > 0 && (
+        <section className="py-16 bg-white">
+          <div className="max-w-6xl mx-auto px-4">
+            <div className="flex items-center justify-between mb-8">
+              <div>
+                <p className="text-emerald-600 text-xs font-bold uppercase tracking-widest mb-1">Selección de la cuenca</p>
+                <h2 className="text-2xl font-black text-gray-900">Recomendados</h2>
+              </div>
+              <Link href="/directory" className="hidden sm:flex items-center gap-1 text-sm font-medium text-gray-400 hover:text-gray-800 transition-colors">
+                Ver todos <ArrowRight className="h-3.5 w-3.5" />
+              </Link>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+              {featured.map((b) => (
+                <BusinessCard key={b.id} business={b} />
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* ── FEATURES ─────────────────────────────────────────────────────── */}
       <section className="py-20 bg-white">

@@ -180,6 +180,7 @@ model Business {
 
   avgRating   Float   @default(0)
   reviewCount Int     @default(0)
+  featured    Boolean @default(false)
 
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
