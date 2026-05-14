@@ -20,13 +20,6 @@ const ICON_MAP: Record<string, LucideIcon> = {
   Activity, ShoppingBag, Bike, GlassWater, Heart, Wrench, Camera,
 };
 
-const CITY_PHOTOS: Record<string, string> = {
-  "puerto-montt": "https://images.unsplash.com/photo-1553761984-30e1bfcb8bdb?w=600&q=80",
-  "puerto-varas": "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&q=80",
-  "llanquihue":   "https://images.unsplash.com/photo-1501854140801-50d01698950b?w=600&q=80",
-  "frutillar":    "https://images.unsplash.com/photo-1551632436-cbf8dd35adfa?w=600&q=80",
-  "puerto-octay": "https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=600&q=80",
-};
 
 export default async function HomePage() {
   const featured = await prisma.business.findMany({
@@ -99,28 +92,17 @@ export default async function HomePage() {
 
       {/* ── CIUDADES ─────────────────────────────────────────────────────── */}
       <section className="py-16 bg-gray-50">
-        <div className="max-w-4xl mx-auto px-4">
-          <div className="flex items-center justify-between mb-10">
-            <h2 className="text-2xl font-black text-gray-900">Explorar por ciudad</h2>
-          </div>
-
-          <div className="flex items-start justify-between gap-4">
+        <div className="max-w-5xl mx-auto px-4">
+          <h2 className="text-2xl font-black text-gray-900 mb-8">Explorar por ciudad</h2>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">
             {CITIES.map((city) => (
               <Link
                 key={city.slug}
                 href={`/directory?ciudad=${city.slug}`}
-                className="group flex flex-col items-center gap-3 flex-1"
+                className="group bg-white border border-gray-100 rounded-2xl px-4 py-5 flex flex-col items-center gap-2 hover:border-emerald-300 hover:shadow-sm transition-all duration-200"
               >
-                <div className="relative w-16 h-16 sm:w-24 sm:h-24 md:w-32 md:h-32 rounded-full overflow-hidden ring-2 ring-transparent group-hover:ring-emerald-400 transition-all duration-300 shadow-md group-hover:shadow-lg">
-                  <Image
-                    src={CITY_PHOTOS[city.slug] ?? "https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=400&q=80"}
-                    alt={city.name}
-                    fill
-                    className="object-cover group-hover:scale-110 transition-transform duration-500"
-                    sizes="112px"
-                  />
-                </div>
-                <span className="text-xs font-semibold text-gray-700 group-hover:text-emerald-600 transition-colors text-center leading-tight">{city.name}</span>
+                <MapPin className="h-5 w-5 text-gray-300 group-hover:text-emerald-500 transition-colors" />
+                <span className="text-sm font-semibold text-gray-700 group-hover:text-emerald-700 transition-colors text-center leading-tight">{city.name}</span>
               </Link>
             ))}
           </div>
