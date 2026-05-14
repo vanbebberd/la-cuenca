@@ -23,15 +23,20 @@ export async function POST(req: NextRequest) {
   const bytes = await file.arrayBuffer();
   const buffer = Buffer.from(bytes);
 
-  const result = await new Promise<{ secure_url: string }>((resolve, reject) => {
-    cloudinary.uploader.upload_stream(
-      { folder: "lacuenca/businesses", resource_type: "image", quality: "auto", fetch_format: "auto" },
-      (error, result) => {
-        if (error || !result) reject(error ?? new Error("Upload failed"));
-        else resolve(result as { secure_url: string });
-      }
-    ).end(buffer);
-  });
-
-  return NextResponse.json({ url: result.secure_url });
+  try {
+    const result = await new Promise<{ secure_url: string }>((resolve, reject) => {
+      cloudinary.uploader.upload_stream(
+        { folder: "lacuenca", resource_type: "image", quality: "auto", fetch_format: "auto" },
+        (error, result) => {
+          if (error || !result) reject(error ?? new Error("Upload failed"));
+          else resolve(result as { secure_url: string });
+        }
+      ).end(buffer);
+    });
+    return NextResponse.json({ url: result.secure_url });
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    console.error("[upload] Cloudinary error:", msg);
+    return NextResponse.json({ error: msg }, { status: 500 });
+  }
 }
