@@ -35,9 +35,16 @@ export async function POST(req: NextRequest) {
     });
 
     return NextResponse.json({ url: result.secure_url });
-  } catch (err) {
-    const msg = err instanceof Error ? err.message : JSON.stringify(err);
-    console.error("[upload] Cloudinary error:", msg);
+  } catch (err: unknown) {
+    let msg = "Error desconocido";
+    if (err instanceof Error) msg = err.message;
+    else if (typeof err === "object" && err !== null) {
+      const e = err as Record<string, unknown>;
+      msg = String(e.message ?? e.error ?? e.http_code ?? JSON.stringify(err));
+    } else {
+      msg = String(err);
+    }
+    console.error("[upload] error:", msg, err);
     return NextResponse.json({ error: msg }, { status: 500 });
   }
 }
