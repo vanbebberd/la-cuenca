@@ -22,7 +22,7 @@ export function Navbar() {
     <header className="sticky top-0 z-50 bg-white/98 backdrop-blur-md border-b border-gray-100 shadow-sm">
       <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
         <Link href="/" className="flex items-center shrink-0">
-          <Image src="/logo.png" alt="La Cuenca" width={200} height={56} className="h-14 w-auto object-contain" />
+          <Image src="/logo.png" alt="La Cuenca" width={240} height={64} className="h-16 w-auto object-contain" />
         </Link>
 
         {/* Desktop nav */}
