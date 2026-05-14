@@ -117,15 +117,16 @@ model User {
 // ─── CATALOG ────────────────────────────────────────────────────────────────
 
 model City {
-  id        String     @id @default(cuid())
-  name      String     @unique
-  slug      String     @unique
-  region    String     @default("Los Lagos")
-  lat       Float?
-  lng       Float?
-  image     String?
-  businesses Business[]
-  events    Event[]
+  id          String     @id @default(cuid())
+  name        String     @unique
+  slug        String     @unique
+  region      String     @default("Los Lagos")
+  lat         Float?
+  lng         Float?
+  image       String?
+  description String?
+  businesses  Business[]
+  events      Event[]
 }
 
 model Category {

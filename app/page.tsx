@@ -10,7 +10,7 @@ import {
 } from "lucide-react";
 import { type LucideIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { CITIES, CATEGORIES } from "@/lib/constants";
+import { CATEGORIES } from "@/lib/constants";
 import { HeroSearch } from "@/components/HeroSearch";
 import { prisma } from "@/lib/prisma";
 import { BusinessCard } from "@/components/BusinessCard";
@@ -30,12 +30,15 @@ const CITY_PHOTOS: Record<string, string> = {
 };
 
 export default async function HomePage() {
-  const featured = await prisma.business.findMany({
-    where: { featured: true, status: "ACTIVE", plan: "PRO" },
-    include: { city: true, category: true },
-    orderBy: { avgRating: "desc" },
-    take: 8,
-  });
+  const [featured, cities] = await Promise.all([
+    prisma.business.findMany({
+      where: { featured: true, status: "ACTIVE", plan: "PRO" },
+      include: { city: true, category: true },
+      orderBy: { avgRating: "desc" },
+      take: 8,
+    }),
+    prisma.city.findMany({ orderBy: { name: "asc" } }),
+  ]);
 
   return (
     <div className="min-h-screen bg-white">
@@ -103,16 +106,12 @@ export default async function HomePage() {
         <div className="max-w-5xl mx-auto px-4">
           <h2 className="text-2xl font-black text-gray-900 mb-8">Explorar por ciudad</h2>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-4">
-            {CITIES.map((city) => (
-              <Link
-                key={city.slug}
-                href={`/directory?ciudad=${city.slug}`}
-                className="group block"
-              >
+            {cities.map((city) => (
+              <Link key={city.slug} href={`/directory?ciudad=${city.slug}`} className="group block">
                 <article className="rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1.5 border border-gray-100/80 bg-white">
                   <div className="relative h-40 overflow-hidden bg-gray-100">
                     <Image
-                      src={CITY_PHOTOS[city.slug] ?? "https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=400&q=80"}
+                      src={city.image ?? CITY_PHOTOS[city.slug] ?? "https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=400&q=80"}
                       alt={city.name}
                       fill
                       className="object-cover group-hover:scale-105 transition-transform duration-500"
@@ -121,6 +120,11 @@ export default async function HomePage() {
                     <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/60 to-transparent" />
                     <p className="absolute bottom-3 left-3 text-sm font-black text-white leading-tight">{city.name}</p>
                   </div>
+                  {city.description && (
+                    <div className="px-3 py-2.5">
+                      <p className="text-xs text-gray-500 line-clamp-2 leading-relaxed">{city.description}</p>
+                    </div>
+                  )}
                 </article>
               </Link>
             ))}
