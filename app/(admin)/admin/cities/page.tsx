@@ -1,8 +1,8 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Plus, Trash2, Pencil, Check, X } from "lucide-react";
+import { Plus, Trash2, Pencil, Check, X, Upload } from "lucide-react";
 import Image from "next/image";
 
 interface City {
@@ -26,6 +26,8 @@ export default function AdminCitiesPage() {
   const [editImage, setEditImage] = useState("");
   const [editDesc, setEditDesc] = useState("");
   const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   async function load() {
     const res = await fetch("/api/admin/cities");
@@ -59,6 +61,25 @@ export default function AdminCitiesPage() {
     setEditing(city.id);
     setEditImage(city.image ?? "");
     setEditDesc(city.description ?? "");
+  }
+
+  async function handleUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+    try {
+      const fd = new FormData();
+      fd.append("file", file);
+      const res = await fetch("/api/admin/upload", { method: "POST", body: fd });
+      if (!res.ok) throw new Error();
+      const { url } = await res.json();
+      setEditImage(url);
+    } catch {
+      alert("Error subiendo la imagen");
+    } finally {
+      setUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
   }
 
   async function saveEdit(id: string) {
@@ -138,13 +159,33 @@ export default function AdminCitiesPage() {
             {editing === city.id && (
               <div className="border-t border-gray-100 px-4 py-4 space-y-3 bg-gray-50">
                 <div>
-                  <label className="text-xs font-medium text-gray-600 mb-1 block">URL de foto</label>
+                  <label className="text-xs font-medium text-gray-600 mb-1 block">Foto</label>
+                  {editImage && (
+                    <div className="relative h-32 rounded-xl overflow-hidden mb-2 bg-gray-100">
+                      <Image src={editImage} alt="Preview" fill className="object-cover" />
+                      <button
+                        type="button"
+                        onClick={() => setEditImage("")}
+                        className="absolute top-2 right-2 bg-black/60 text-white rounded-full p-1 hover:bg-black/80"
+                      >
+                        <X className="h-3 w-3" />
+                      </button>
+                    </div>
+                  )}
+                  <div className="flex gap-2">
+                    <Button type="button" variant="outline" size="sm" onClick={() => fileInputRef.current?.click()} disabled={uploading}>
+                      <Upload className="h-3.5 w-3.5" />
+                      {uploading ? "Subiendo..." : "Subir foto"}
+                    </Button>
+                  </div>
+                  <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleUpload} />
+                  <p className="text-xs text-gray-400 mt-2">O pega una URL directamente:</p>
                   <Input
                     value={editImage}
                     onChange={e => setEditImage(e.target.value)}
-                    placeholder="https://images.unsplash.com/..."
+                    placeholder="https://..."
+                    className="mt-1"
                   />
-                  <p className="text-xs text-gray-400 mt-1">Pega una URL de Unsplash, Cloudinary o cualquier imagen pública</p>
                 </div>
                 <div>
                   <label className="text-xs font-medium text-gray-600 mb-1 block">Descripción corta</label>
