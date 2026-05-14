@@ -56,7 +56,7 @@ export default async function HomePage() {
           </p>
 
           <h1 className="text-5xl sm:text-6xl lg:text-7xl font-black leading-[1.05] mb-5">
-            El mejor lugar<br />para explorar<br />
+            Descubre, vive<br />y disfruta<br />
             <span className="text-emerald-400">la cuenca</span>
           </h1>
 
