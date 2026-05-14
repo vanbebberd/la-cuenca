@@ -34,6 +34,7 @@ export default async function AdminBusinessesPage() {
               <th className="text-left px-4 py-3 font-medium text-gray-500 hidden sm:table-cell">Categoría</th>
               <th className="text-left px-4 py-3 font-medium text-gray-500 hidden md:table-cell">Ciudad</th>
               <th className="text-left px-4 py-3 font-medium text-gray-500 hidden lg:table-cell">Precio</th>
+              <th className="text-left px-4 py-3 font-medium text-gray-500 hidden lg:table-cell">Plan</th>
               <th className="text-left px-4 py-3 font-medium text-gray-500">Estado</th>
               <th className="text-left px-4 py-3 font-medium text-gray-500">Rating</th>
               <th className="px-4 py-3" />
@@ -49,6 +50,15 @@ export default async function AdminBusinessesPage() {
                 <td className="px-4 py-3 hidden sm:table-cell text-gray-500">{b.category.name}</td>
                 <td className="px-4 py-3 hidden md:table-cell text-gray-500">{b.city.name}</td>
                 <td className="px-4 py-3 hidden lg:table-cell text-gray-500 font-mono">{priceRangeLabel(b.priceRange)}</td>
+                <td className="px-4 py-3 hidden lg:table-cell">
+                  <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold ${
+                    b.plan === "PRO" ? "bg-amber-100 text-amber-700" :
+                    b.plan === "BASIC" ? "bg-blue-100 text-blue-700" :
+                    "bg-gray-100 text-gray-500"
+                  }`}>
+                    {b.plan}
+                  </span>
+                </td>
                 <td className="px-4 py-3">
                   <Badge variant={b.status === "ACTIVE" ? "green" : b.status === "PENDING" ? "amber" : "secondary"}>
                     {b.status === "ACTIVE" ? "Activo" : b.status === "PENDING" ? "Pendiente" : "Inactivo"}

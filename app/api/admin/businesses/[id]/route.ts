@@ -12,7 +12,7 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
   const { id } = await params;
   const business = await prisma.business.findUnique({
     where: { id },
-    include: { city: true, category: true },
+    include: { city: true, category: true, hours: { orderBy: { dayOfWeek: "asc" } } },
   });
   if (!business) return NextResponse.json({ error: "No encontrado" }, { status: 404 });
   return NextResponse.json(business);

@@ -40,6 +40,12 @@ enum PriceRange {
   LUXURY
 }
 
+enum PlanType {
+  FREE
+  BASIC
+  PRO
+}
+
 enum TransactionType {
   EARN
   REDEEM
@@ -178,9 +184,10 @@ model Business {
   favorites   Favorite[]
   pointsTx    PointsTransaction[]
 
-  avgRating   Float   @default(0)
-  reviewCount Int     @default(0)
-  featured    Boolean @default(false)
+  avgRating   Float    @default(0)
+  reviewCount Int      @default(0)
+  featured    Boolean  @default(false)
+  plan        PlanType @default(FREE)
 
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt

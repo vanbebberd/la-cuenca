@@ -10,6 +10,13 @@ import Image from "next/image";
 
 interface City { id: string; name: string; slug: string; }
 interface Category { id: string; name: string; slug: string; }
+interface HourEntry { dayOfWeek: number; openTime: string; closeTime: string; closed: boolean; }
+
+const DAYS_LABELS = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"];
+
+function defaultHours(): HourEntry[] {
+  return [0, 1, 2, 3, 4, 5, 6].map((d) => ({ dayOfWeek: d, openTime: "09:00", closeTime: "21:00", closed: false }));
+}
 
 export default function EditBusinessPage() {
   const router = useRouter();
@@ -23,13 +30,14 @@ export default function EditBusinessPage() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [uploadingImage, setUploadingImage] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [hours, setHours] = useState<HourEntry[]>(defaultHours());
 
   const [form, setForm] = useState({
     name: "", shortDesc: "", description: "", citySlug: "", categorySlug: "",
     priceRange: "", address: "", phone: "", whatsapp: "", email: "",
     website: "", instagram: "", facebook: "", menuUrl: "",
     lat: "", lng: "", pointsEnabled: false, pointsPerPeso: "0.01",
-    coverImage: "", status: "ACTIVE", featured: false,
+    coverImage: "", status: "ACTIVE", featured: false, plan: "FREE",
   });
 
   useEffect(() => {
@@ -63,7 +71,14 @@ export default function EditBusinessPage() {
         coverImage: business.coverImage ?? "",
         status: business.status ?? "ACTIVE",
         featured: business.featured ?? false,
+        plan: business.plan ?? "FREE",
       });
+      setHours([0, 1, 2, 3, 4, 5, 6].map((d) => {
+        const existing = (business.hours ?? []).find((h: HourEntry) => h.dayOfWeek === d);
+        return existing
+          ? { dayOfWeek: d, openTime: existing.openTime ?? "09:00", closeTime: existing.closeTime ?? "21:00", closed: existing.closed }
+          : { dayOfWeek: d, openTime: "09:00", closeTime: "21:00", closed: false };
+      }));
     }).catch(() => setError("Error cargando local")).finally(() => setLoading(false));
   }, [id]);
 
@@ -98,20 +113,28 @@ export default function EditBusinessPage() {
     setSaving(true);
     setError("");
     try {
-      const res = await fetch(`/api/admin/businesses/${id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          ...form,
-          lat: form.lat ? parseFloat(form.lat) : null,
-          lng: form.lng ? parseFloat(form.lng) : null,
-          pointsPerPeso: parseFloat(form.pointsPerPeso),
-          email: form.email || null,
-          priceRange: form.priceRange || null,
-          coverImage: form.coverImage || null,
+      const [mainRes, hoursRes] = await Promise.all([
+        fetch(`/api/admin/businesses/${id}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            ...form,
+            lat: form.lat ? parseFloat(form.lat) : null,
+            lng: form.lng ? parseFloat(form.lng) : null,
+            pointsPerPeso: parseFloat(form.pointsPerPeso),
+            email: form.email || null,
+            priceRange: form.priceRange || null,
+            coverImage: form.coverImage || null,
+          }),
         }),
-      });
-      if (!res.ok) throw new Error((await res.json()).error ?? "Error al guardar");
+        fetch(`/api/admin/businesses/${id}/hours`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ hours }),
+        }),
+      ]);
+      if (!mainRes.ok) throw new Error((await mainRes.json()).error ?? "Error al guardar");
+      if (!hoursRes.ok) throw new Error("Error guardando horarios");
       router.push("/admin/businesses");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Error");
@@ -276,15 +299,91 @@ export default function EditBusinessPage() {
           )}
         </div>
 
-        {/* Destacado */}
-        <div className="border-t border-gray-100 pt-4">
-          <label className="flex items-center gap-3 cursor-pointer group">
-            <input type="checkbox" name="featured" checked={form.featured} onChange={handleChange} className="rounded w-4 h-4 accent-emerald-600" />
-            <div>
-              <span className="text-sm font-medium text-gray-800">⭐ Destacar en el inicio</span>
-              <p className="text-xs text-gray-400">Aparece en la sección de recomendados de la página principal</p>
+        {/* Horarios */}
+        <div className="space-y-3 border-t border-gray-100 pt-4">
+          <h2 className="text-sm font-semibold text-gray-700 uppercase tracking-wider">Horarios de atención</h2>
+          <div className="space-y-2">
+            {DAYS_LABELS.map((day, i) => {
+              const h = hours[i];
+              return (
+                <div key={i} className="flex items-center gap-2">
+                  <span className="text-xs font-medium text-gray-500 w-8 shrink-0">{day}</span>
+                  <label className="flex items-center gap-1.5 cursor-pointer shrink-0">
+                    <input
+                      type="checkbox"
+                      checked={h.closed}
+                      onChange={(e) => {
+                        const updated = [...hours];
+                        updated[i] = { ...updated[i], closed: e.target.checked };
+                        setHours(updated);
+                      }}
+                      className="rounded"
+                    />
+                    <span className="text-xs text-gray-400">Cerrado</span>
+                  </label>
+                  {!h.closed && (
+                    <>
+                      <Input
+                        type="time"
+                        value={h.openTime}
+                        onChange={(e) => {
+                          const updated = [...hours];
+                          updated[i] = { ...updated[i], openTime: e.target.value };
+                          setHours(updated);
+                        }}
+                        className="h-8 text-xs w-28"
+                      />
+                      <span className="text-xs text-gray-300">–</span>
+                      <Input
+                        type="time"
+                        value={h.closeTime}
+                        onChange={(e) => {
+                          const updated = [...hours];
+                          updated[i] = { ...updated[i], closeTime: e.target.value };
+                          setHours(updated);
+                        }}
+                        className="h-8 text-xs w-28"
+                      />
+                    </>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Plan y visibilidad */}
+        <div className="space-y-4 border-t border-gray-100 pt-4">
+          <h2 className="text-sm font-semibold text-gray-700 uppercase tracking-wider">Plan y visibilidad</h2>
+          <div>
+            <label className="block text-xs font-medium text-gray-600 mb-2">Plan activo</label>
+            <div className="grid grid-cols-3 gap-2">
+              {[
+                { value: "FREE", label: "Free", desc: "Listado básico", color: "border-gray-200 text-gray-600", active: "border-gray-500 bg-gray-50 text-gray-900" },
+                { value: "BASIC", label: "Basic", desc: "Fotos y contacto", color: "border-blue-200 text-blue-600", active: "border-blue-500 bg-blue-50 text-blue-900" },
+                { value: "PRO", label: "Pro", desc: "Destacado + todo", color: "border-amber-200 text-amber-600", active: "border-amber-500 bg-amber-50 text-amber-900" },
+              ].map((p) => (
+                <button
+                  key={p.value}
+                  type="button"
+                  onClick={() => setForm((prev) => ({ ...prev, plan: p.value, featured: p.value !== "PRO" ? false : prev.featured }))}
+                  className={`rounded-xl border-2 p-3 text-left transition-all ${form.plan === p.value ? p.active : "border-gray-100 text-gray-400 hover:border-gray-200"}`}
+                >
+                  <p className="text-sm font-bold">{p.label}</p>
+                  <p className="text-xs mt-0.5 opacity-70">{p.desc}</p>
+                </button>
+              ))}
             </div>
-          </label>
+          </div>
+          {form.plan === "PRO" && (
+            <label className="flex items-center gap-3 cursor-pointer">
+              <input type="checkbox" name="featured" checked={form.featured} onChange={handleChange} className="rounded w-4 h-4 accent-amber-500" />
+              <div>
+                <span className="text-sm font-medium text-gray-800">⭐ Destacar en el inicio</span>
+                <p className="text-xs text-gray-400">Aparece en la sección de recomendados de la página principal</p>
+              </div>
+            </label>
+          )}
         </div>
 
         {error && <p className="text-sm text-red-500">{error}</p>}

@@ -30,7 +30,7 @@ const CITY_PHOTOS: Record<string, string> = {
 
 export default async function HomePage() {
   const featured = await prisma.business.findMany({
-    where: { featured: true, status: "ACTIVE" },
+    where: { featured: true, status: "ACTIVE", plan: "PRO" },
     include: { city: true, category: true },
     orderBy: { avgRating: "desc" },
     take: 8,
