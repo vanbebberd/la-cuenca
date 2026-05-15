@@ -47,6 +47,11 @@ export function Navbar() {
         </nav>
 
         <div className="hidden md:flex items-center gap-2">
+          <Link href="/planes">
+            <Button size="sm" variant="outline" className="gap-1.5 border-emerald-200 text-emerald-700 hover:bg-emerald-50">
+              Únete a La Cuenca
+            </Button>
+          </Link>
           {session ? (
             <div className="flex items-center gap-3">
               <span className="text-sm text-gray-500">{session.user?.name?.split(" ")[0] ?? session.user?.email?.split("@")[0]}</span>
@@ -86,7 +91,10 @@ export function Navbar() {
               Admin
             </Link>
           )}
-          <div className="pt-2 border-t border-gray-100 mt-1">
+          <div className="pt-2 border-t border-gray-100 mt-1 space-y-2">
+            <Link href="/planes" onClick={() => setOpen(false)}>
+              <Button variant="outline" size="sm" className="w-full border-emerald-200 text-emerald-700">Únete a La Cuenca</Button>
+            </Link>
             {session ? (
               <Button variant="outline" size="sm" className="w-full" onClick={() => signOut()}>Cerrar sesión</Button>
             ) : (

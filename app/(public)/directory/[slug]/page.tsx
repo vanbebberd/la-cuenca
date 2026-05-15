@@ -224,7 +224,7 @@ export default async function BusinessPage({ params }: Props) {
           {/* Sidebar */}
           <div className="space-y-5">
             {/* Contact & location card */}
-            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 sticky top-24">
+            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 lg:sticky lg:top-24">
               <h2 className="text-sm font-bold text-gray-900 mb-4">Contacto y cómo llegar</h2>
 
               <div className="space-y-2.5">

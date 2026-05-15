@@ -5,7 +5,7 @@ import Image from "next/image";
 import {
   MapPin, Ticket, Gift, Star, Sparkles,
   Coffee, UtensilsCrossed, BedDouble, Beer, Map,
-  Activity, ShoppingBag, Bike, GlassWater, Heart, Wrench, Camera,
+  Activity, ShoppingBag, Bike, GlassWater, Heart, Wrench, Camera, Compass,
   ArrowRight, CheckCircle2,
 } from "lucide-react";
 import { type LucideIcon } from "lucide-react";
@@ -17,7 +17,7 @@ import { BusinessCard } from "@/components/BusinessCard";
 
 const ICON_MAP: Record<string, LucideIcon> = {
   UtensilsCrossed, Coffee, BedDouble, Beer, Map,
-  Activity, ShoppingBag, Bike, GlassWater, Heart, Wrench, Camera,
+  Activity, ShoppingBag, Bike, GlassWater, Heart, Wrench, Camera, Compass,
 };
 
 const CITY_PHOTOS: Record<string, string> = {

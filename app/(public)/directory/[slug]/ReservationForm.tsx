@@ -3,11 +3,12 @@ import { useState } from "react";
 import { useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { CalendarDays, Users, Clock, CheckCircle2 } from "lucide-react";
+import { CalendarDays, Users, Clock, CheckCircle2, User } from "lucide-react";
 import Link from "next/link";
 
 export function ReservationForm({ businessId, businessName }: { businessId: string; businessName: string }) {
   const { data: session } = useSession();
+  const [name, setName] = useState(session?.user?.name ?? "");
   const [date, setDate] = useState("");
   const [time, setTime] = useState("");
   const [people, setPeople] = useState("2");
@@ -24,7 +25,7 @@ export function ReservationForm({ businessId, businessName }: { businessId: stri
       const res = await fetch("/api/reservations", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ businessId, date, time, partySize: Number(people), notes }),
+        body: JSON.stringify({ businessId, date, time, partySize: Number(people), notes: `${name ? `Nombre: ${name}. ` : ""}${notes}` }),
       });
       if (!res.ok) throw new Error((await res.json()).error ?? "Error al reservar");
       setDone(true);
@@ -60,17 +61,29 @@ export function ReservationForm({ businessId, businessName }: { businessId: stri
       ) : (
         <form onSubmit={handleSubmit} className="space-y-3">
           <div>
+            <label className="text-xs text-gray-500 font-medium mb-1 flex items-center gap-1">
+              <User className="h-3 w-3" />Nombre
+            </label>
+            <Input
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Tu nombre"
+              required
+            />
+          </div>
+          <div>
             <label className="text-xs text-gray-500 font-medium mb-1 block">Fecha</label>
             <Input type="date" value={date} onChange={(e) => setDate(e.target.value)} min={new Date().toISOString().split("T")[0]} required />
           </div>
           <div>
-            <label className="text-xs text-gray-500 font-medium mb-1 block flex items-center gap-1">
+            <label className="text-xs text-gray-500 font-medium mb-1 flex items-center gap-1">
               <Clock className="h-3 w-3" />Hora
             </label>
             <Input type="time" value={time} onChange={(e) => setTime(e.target.value)} required />
           </div>
           <div>
-            <label className="text-xs text-gray-500 font-medium mb-1 block flex items-center gap-1">
+            <label className="text-xs text-gray-500 font-medium mb-1 flex items-center gap-1">
               <Users className="h-3 w-3" />Personas
             </label>
             <Input type="number" min="1" max="20" value={people} onChange={(e) => setPeople(e.target.value)} required />

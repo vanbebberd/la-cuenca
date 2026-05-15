@@ -20,6 +20,7 @@ export const CATEGORIES = [
   { name: "Wellness", slug: "wellness", icon: "Heart", color: "#14b8a6" },
   { name: "Servicios", slug: "servicios", icon: "Wrench", color: "#6b7280" },
   { name: "Panoramas", slug: "panoramas", icon: "Camera", color: "#06b6d4" },
+  { name: "Tours", slug: "tours", icon: "Compass", color: "#0ea5e9" },
 ] as const;
 
 export const PRICE_RANGES = [
