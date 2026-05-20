@@ -166,8 +166,8 @@ export default async function BusinessPage({ params }: Props) {
                     const a = AMENITIES.find(x => x.id === id);
                     if (!a) return null;
                     return (
-                      <span key={id} className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gray-50 border border-gray-200 rounded-xl text-sm text-gray-700">
-                        <span>{a.emoji}</span>
+                      <span key={id} className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gray-50 border border-gray-200 rounded-xl text-sm text-gray-600">
+                        <span style={{ filter: "grayscale(1) opacity(0.7)" }}>{a.emoji}</span>
                         {a.label}
                       </span>
                     );
