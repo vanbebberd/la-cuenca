@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { BusinessCard } from "@/components/BusinessCard";
 import { CITIES, CATEGORIES, PRICE_RANGES } from "@/lib/constants";
+import { DirectoryMap } from "@/components/DirectoryMap";
 import Link from "next/link";
 import { Search, SlidersHorizontal, X } from "lucide-react";
 import type { Metadata } from "next";
@@ -39,6 +40,20 @@ export default async function DirectoryPage({ searchParams }: DirectoryPageProps
   const activePrecio = PRICE_RANGES.find((p) => p.value === precio);
 
   const hasFilters = !!(ciudad || categoria || precio || q);
+
+  const mapBusinesses = businesses
+    .filter((b) => b.lat && b.lng)
+    .map((b) => ({
+      id: b.id,
+      name: b.name,
+      slug: b.slug,
+      lat: b.lat as number,
+      lng: b.lng as number,
+      categoryName: b.category.name,
+      categoryColor: b.category.color ?? "#10b981",
+    }));
+
+  const showMap = mapBusinesses.length > 0;
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -87,9 +102,9 @@ export default async function DirectoryPage({ searchParams }: DirectoryPageProps
       </div>
 
       <div className="max-w-7xl mx-auto px-4 py-8">
-        <div className="flex flex-col lg:flex-row gap-8">
+        <div className="flex flex-col lg:flex-row gap-6">
           {/* Sidebar */}
-          <aside className="lg:w-60 shrink-0">
+          <aside className="lg:w-56 shrink-0">
             <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 space-y-6 sticky top-24">
 
               {/* Search */}
@@ -154,22 +169,38 @@ export default async function DirectoryPage({ searchParams }: DirectoryPageProps
             </div>
           </aside>
 
-          {/* Grid */}
-          <div className="flex-1">
-            {businesses.length === 0 ? (
-              <div className="bg-white rounded-2xl border border-gray-100 text-center py-20 px-6">
-                <p className="text-4xl mb-4">🔍</p>
-                <p className="text-lg font-semibold text-gray-800 mb-1">Sin resultados</p>
-                <p className="text-gray-400 text-sm mb-4">No encontramos locales con esos filtros.</p>
-                <Link href="/directory" className="text-sm text-emerald-600 font-medium hover:underline">
-                  Ver todo
-                </Link>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
-                {businesses.map((b: (typeof businesses)[number]) => (
-                  <BusinessCard key={b.id} business={b} />
-                ))}
+          {/* Results + Map */}
+          <div className="flex-1 flex flex-col xl:flex-row gap-6 min-w-0">
+            {/* Grid */}
+            <div className={showMap ? "xl:flex-1 xl:min-w-0" : "flex-1"}>
+              {businesses.length === 0 ? (
+                <div className="bg-white rounded-2xl border border-gray-100 text-center py-20 px-6">
+                  <p className="text-4xl mb-4">🔍</p>
+                  <p className="text-lg font-semibold text-gray-800 mb-1">Sin resultados</p>
+                  <p className="text-gray-400 text-sm mb-4">No encontramos locales con esos filtros.</p>
+                  <Link href="/directory" className="text-sm text-emerald-600 font-medium hover:underline">
+                    Ver todo
+                  </Link>
+                </div>
+              ) : (
+                <div className={`grid gap-5 ${showMap ? "grid-cols-1 sm:grid-cols-2" : "grid-cols-1 sm:grid-cols-2 xl:grid-cols-3"}`}>
+                  {businesses.map((b: (typeof businesses)[number]) => (
+                    <BusinessCard key={b.id} business={b} />
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Map */}
+            {showMap && (
+              <div className="xl:w-[440px] shrink-0">
+                <div className="xl:sticky xl:top-24 h-72 xl:h-[calc(100vh-7rem)] rounded-2xl overflow-hidden border border-gray-100 shadow-sm">
+                  <DirectoryMap
+                    businesses={mapBusinesses}
+                    centerLat={activeCity?.lat}
+                    centerLng={activeCity?.lng}
+                  />
+                </div>
               </div>
             )}
           </div>
