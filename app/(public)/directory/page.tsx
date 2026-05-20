@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { BusinessCard } from "@/components/BusinessCard";
 import { CITIES, CATEGORIES, PRICE_RANGES } from "@/lib/constants";
 import { DirectoryMap } from "@/components/DirectoryMap";
+import { getLang, t } from "@/lib/i18n";
 import Link from "next/link";
 import { Search, SlidersHorizontal, X } from "lucide-react";
 import type { Metadata } from "next";
@@ -15,6 +16,7 @@ interface DirectoryPageProps {
 export default async function DirectoryPage({ searchParams }: DirectoryPageProps) {
   const params = await searchParams;
   const { ciudad, categoria, precio, q } = params;
+  const lang = await getLang();
 
   const businesses = await prisma.business.findMany({
     where: {
@@ -61,13 +63,14 @@ export default async function DirectoryPage({ searchParams }: DirectoryPageProps
       <div className="bg-white border-b border-gray-100">
         <div className="max-w-7xl mx-auto px-4 py-6">
           <h1 className="text-2xl font-bold text-gray-900">
-            {activeCat ? activeCat.name : activeCity ? `Explorar — ${activeCity.name}` : "Explorar todo"}
+            {activeCat ? activeCat.name : activeCity ? `${t("dir_explore_all", lang).split(" ")[0]} — ${activeCity.name}` : t("dir_explore_all", lang)}
           </h1>
           <div className="flex items-center gap-3 mt-2 flex-wrap">
             <p className="text-sm text-gray-500">
               <span className="font-semibold text-gray-900">{businesses.length}</span>{" "}
-              resultado{businesses.length !== 1 ? "s" : ""}
-              {activeCity ? ` en ${activeCity.name}` : " en toda la cuenca"}
+              {activeCity
+                ? `${businesses.length === 1 ? t("dir_results_city", lang) : t("dir_results_city_p", lang)} ${activeCity.name}`
+                : businesses.length === 1 ? t("dir_results_all", lang) : t("dir_results_all_p", lang)}
             </p>
             {/* Active filter chips */}
             {hasFilters && (
@@ -93,7 +96,7 @@ export default async function DirectoryPage({ searchParams }: DirectoryPageProps
                   </Link>
                 )}
                 <Link href="/directory" className="text-xs text-gray-400 hover:text-gray-600 underline transition-colors">
-                  Limpiar filtros
+                  {t("dir_clear", lang)}
                 </Link>
               </div>
             )}
@@ -115,7 +118,7 @@ export default async function DirectoryPage({ searchParams }: DirectoryPageProps
                     <input
                       name="q"
                       defaultValue={q}
-                      placeholder="Buscar local..."
+                      placeholder={t("dir_search", lang)}
                       className="w-full pl-9 pr-3 py-2.5 text-sm rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-gray-50"
                     />
                     {ciudad && <input type="hidden" name="ciudad" value={ciudad} />}
@@ -129,10 +132,10 @@ export default async function DirectoryPage({ searchParams }: DirectoryPageProps
               <div>
                 <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3 flex items-center gap-1.5">
                   <SlidersHorizontal className="h-3.5 w-3.5" />
-                  Ciudad
+                  {t("dir_city", lang)}
                 </p>
                 <div className="space-y-0.5">
-                  <FilterLink href={buildUrl({ categoria, precio, q })} active={!ciudad} label="Todas las ciudades" />
+                  <FilterLink href={buildUrl({ categoria, precio, q })} active={!ciudad} label={t("dir_all_cities", lang)} />
                   {CITIES.map((c) => (
                     <FilterLink key={c.slug} href={buildUrl({ ciudad: c.slug, categoria, precio, q })} active={ciudad === c.slug} label={c.name} />
                   ))}
@@ -141,9 +144,9 @@ export default async function DirectoryPage({ searchParams }: DirectoryPageProps
 
               {/* Categories */}
               <div>
-                <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Categoría</p>
+                <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">{t("dir_category", lang)}</p>
                 <div className="space-y-0.5">
-                  <FilterLink href={buildUrl({ ciudad, precio, q })} active={!categoria} label="Todas las categorías" />
+                  <FilterLink href={buildUrl({ ciudad, precio, q })} active={!categoria} label={t("dir_all_cats", lang)} />
                   {CATEGORIES.map((cat) => (
                     <FilterLink key={cat.slug} href={buildUrl({ ciudad, categoria: cat.slug, precio, q })} active={categoria === cat.slug} label={cat.name} />
                   ))}
@@ -152,9 +155,9 @@ export default async function DirectoryPage({ searchParams }: DirectoryPageProps
 
               {/* Price */}
               <div>
-                <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Precio</p>
+                <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">{t("dir_price", lang)}</p>
                 <div className="space-y-0.5">
-                  <FilterLink href={buildUrl({ ciudad, categoria, q })} active={!precio} label="Cualquier precio" />
+                  <FilterLink href={buildUrl({ ciudad, categoria, q })} active={!precio} label={t("dir_any_price", lang)} />
                   {PRICE_RANGES.map((p) => (
                     <FilterLink
                       key={p.value}
@@ -176,10 +179,10 @@ export default async function DirectoryPage({ searchParams }: DirectoryPageProps
               {businesses.length === 0 ? (
                 <div className="bg-white rounded-2xl border border-gray-100 text-center py-20 px-6">
                   <p className="text-4xl mb-4">🔍</p>
-                  <p className="text-lg font-semibold text-gray-800 mb-1">Sin resultados</p>
-                  <p className="text-gray-400 text-sm mb-4">No encontramos locales con esos filtros.</p>
+                  <p className="text-lg font-semibold text-gray-800 mb-1">{t("dir_no_results", lang)}</p>
+                  <p className="text-gray-400 text-sm mb-4">{t("dir_no_results_desc", lang)}</p>
                   <Link href="/directory" className="text-sm text-emerald-600 font-medium hover:underline">
-                    Ver todo
+                    {t("dir_see_all", lang)}
                   </Link>
                 </div>
               ) : (

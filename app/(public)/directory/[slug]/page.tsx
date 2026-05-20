@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { StarRating } from "@/components/StarRating";
 import { priceRangeLabel, uberDeepLink } from "@/lib/utils";
 import { AMENITIES } from "@/lib/constants";
+import { getLang, t, tDays } from "@/lib/i18n";
 import type { Metadata } from "next";
 import { ReservationForm } from "./ReservationForm";
 import { ReviewSection } from "./ReviewSection";
@@ -28,7 +29,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-const DAYS = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"];
 
 export default async function BusinessPage({ params }: Props) {
   const { slug } = await params;
@@ -50,6 +50,8 @@ export default async function BusinessPage({ params }: Props) {
 
   if (!business) notFound();
 
+  const lang = await getLang();
+  const DAYS = tDays(lang);
   const today = new Date().getDay();
   const todayHours = business.hours.find((h) => h.dayOfWeek === today);
   const isOpen = todayHours && !todayHours.closed && todayHours.openTime && todayHours.closeTime;
@@ -70,7 +72,7 @@ export default async function BusinessPage({ params }: Props) {
         {/* Breadcrumb over image */}
         <div className="absolute top-4 left-4 right-4">
           <nav className="flex items-center gap-1.5 text-xs text-white/80">
-            <Link href="/directory" className="hover:text-white transition-colors">Explorar</Link>
+            <Link href="/directory" className="hover:text-white transition-colors">{t("bus_explore", lang)}</Link>
             <ChevronRight className="h-3 w-3 opacity-50" />
             <Link href={`/directory?ciudad=${business.city.slug}`} className="hover:text-white transition-colors">{business.city.name}</Link>
             <ChevronRight className="h-3 w-3 opacity-50" />
@@ -104,12 +106,12 @@ export default async function BusinessPage({ params }: Props) {
                 {business.verified && (
                   <span className="inline-flex items-center gap-1 text-xs text-blue-600 font-semibold">
                     <CheckCircle2 className="h-3.5 w-3.5" />
-                    Verificado
+                    {t("bus_verified", lang)}
                   </span>
                 )}
                 <span className={`inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full ${isOpen ? "bg-emerald-100 text-emerald-700" : "bg-gray-100 text-gray-500"}`}>
                   <span className={`w-1.5 h-1.5 rounded-full ${isOpen ? "bg-emerald-500" : "bg-gray-400"}`} />
-                  {isOpen ? "Abierto ahora" : "Cerrado ahora"}
+                  {isOpen ? t("bus_open_now", lang) : t("bus_closed_now", lang)}
                 </span>
               </div>
               <h1 className="text-2xl sm:text-3xl font-black text-gray-900 leading-tight">{business.name}</h1>
@@ -129,7 +131,7 @@ export default async function BusinessPage({ params }: Props) {
                 <a href={`tel:${business.phone}`}>
                   <Button variant="outline" size="sm" className="gap-1.5">
                     <Phone className="h-3.5 w-3.5" />
-                    Llamar
+                    {t("bus_call", lang)}
                   </Button>
                 </a>
               )}
@@ -152,7 +154,7 @@ export default async function BusinessPage({ params }: Props) {
             {/* Description */}
             {business.description && (
               <section className="bg-white rounded-2xl border border-gray-100 p-6">
-                <h2 className="text-base font-bold text-gray-900 mb-3">Sobre el lugar</h2>
+                <h2 className="text-base font-bold text-gray-900 mb-3">{t("bus_about", lang)}</h2>
                 <p className="text-gray-600 text-sm leading-relaxed whitespace-pre-line">{business.description}</p>
               </section>
             )}
@@ -160,7 +162,7 @@ export default async function BusinessPage({ params }: Props) {
             {/* Amenities */}
             {business.amenities && business.amenities.length > 0 && (
               <section className="bg-white rounded-2xl border border-gray-100 p-6">
-                <h2 className="text-base font-bold text-gray-900 mb-4">Características y servicios</h2>
+                <h2 className="text-base font-bold text-gray-900 mb-4">{t("bus_amenities", lang)}</h2>
                 <div className="flex flex-wrap gap-2">
                   {business.amenities.map(id => {
                     const a = AMENITIES.find(x => x.id === id);
@@ -179,7 +181,7 @@ export default async function BusinessPage({ params }: Props) {
             {/* Photo gallery */}
             {business.photos.length > 0 && (
               <section className="bg-white rounded-2xl border border-gray-100 p-6">
-                <h2 className="text-base font-bold text-gray-900 mb-4">Galería de fotos</h2>
+                <h2 className="text-base font-bold text-gray-900 mb-4">{t("bus_gallery", lang)}</h2>
                 <div className="grid grid-cols-3 gap-2">
                   {business.photos.slice(0, 6).map((photo, i: number) => (
                     <div
@@ -198,7 +200,7 @@ export default async function BusinessPage({ params }: Props) {
               <section className="bg-white rounded-2xl border border-gray-100 p-6">
                 <h2 className="text-base font-bold text-gray-900 mb-4 flex items-center gap-2">
                   <Clock className="h-4 w-4 text-gray-400" />
-                  Horarios de atención
+                  {t("bus_hours", lang)}
                 </h2>
                 <div className="space-y-1">
                   {DAYS.map((day, i) => {
@@ -209,9 +211,9 @@ export default async function BusinessPage({ params }: Props) {
                         key={i}
                         className={`flex justify-between items-center py-2 px-3 rounded-lg text-sm ${isToday ? "bg-emerald-50 font-semibold text-emerald-800" : "text-gray-600"}`}
                       >
-                        <span>{day}{isToday && <span className="ml-2 text-xs bg-emerald-200 text-emerald-800 px-1.5 py-0.5 rounded-full font-semibold">hoy</span>}</span>
+                        <span>{day}{isToday && <span className="ml-2 text-xs bg-emerald-200 text-emerald-800 px-1.5 py-0.5 rounded-full font-semibold">{t("bus_today", lang)}</span>}</span>
                         <span className={isToday ? "text-emerald-700" : "text-gray-400"}>
-                          {!h || h.closed ? "Cerrado" : h.openTime && h.closeTime ? `${h.openTime} – ${h.closeTime}` : "—"}
+                          {!h || h.closed ? t("bus_day_closed", lang) : h.openTime && h.closeTime ? `${h.openTime} – ${h.closeTime}` : "—"}
                         </span>
                       </div>
                     );
@@ -223,11 +225,11 @@ export default async function BusinessPage({ params }: Props) {
             {/* Menu */}
             {business.menuUrl && (
               <section className="bg-white rounded-2xl border border-gray-100 p-6">
-                <h2 className="text-base font-bold text-gray-900 mb-3">Carta / Menú</h2>
+                <h2 className="text-base font-bold text-gray-900 mb-3">{t("bus_menu", lang)}</h2>
                 <a href={business.menuUrl} target="_blank" rel="noopener noreferrer">
                   <Button variant="outline" className="gap-2">
                     <ExternalLink className="h-4 w-4" />
-                    Ver carta completa
+                    {t("bus_view_menu", lang)}
                   </Button>
                 </a>
               </section>
@@ -246,7 +248,7 @@ export default async function BusinessPage({ params }: Props) {
           <div className="space-y-5">
             {/* Contact & location card */}
             <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 lg:sticky lg:top-24">
-              <h2 className="text-sm font-bold text-gray-900 mb-4">Contacto y cómo llegar</h2>
+              <h2 className="text-sm font-bold text-gray-900 mb-4">{t("bus_contact", lang)}</h2>
 
               <div className="space-y-2.5">
                 {business.phone && (
@@ -314,13 +316,13 @@ export default async function BusinessPage({ params }: Props) {
                   >
                     <Button variant="outline" size="sm" className="w-full gap-2 justify-start">
                       <MapPin className="h-3.5 w-3.5 text-red-500" />
-                      Abrir en Google Maps
+                      {t("bus_open_maps", lang)}
                     </Button>
                   </a>
                   <a href={uberDeepLink(business.lat, business.lng, business.name)} target="_blank" rel="noopener noreferrer">
                     <Button variant="secondary" size="sm" className="w-full gap-2 justify-start mt-2">
                       <Navigation className="h-3.5 w-3.5" />
-                      Pedir Uber para llegar
+                      {t("bus_uber", lang)}
                     </Button>
                   </a>
                 </div>
@@ -329,8 +331,8 @@ export default async function BusinessPage({ params }: Props) {
               {/* Points */}
               {business.pointsEnabled && (
                 <div className="mt-4 rounded-xl bg-amber-50 border border-amber-100 p-3 text-xs text-amber-800">
-                  <p className="font-bold mb-0.5">🎁 Acumula puntos aquí</p>
-                  <p className="text-amber-700">Gana {Math.round(business.pointsPerPeso * 1000)} pts por cada $1.000</p>
+                  <p className="font-bold mb-0.5">🎁 {t("bus_points_title", lang)}</p>
+                  <p className="text-amber-700">{lang === "es" ? "Gana" : lang === "en" ? "Earn" : "Ganhe"} {Math.round(business.pointsPerPeso * 1000)} {t("bus_points_earn", lang)}</p>
                 </div>
               )}
 
@@ -338,7 +340,7 @@ export default async function BusinessPage({ params }: Props) {
               {business.rewards.length > 0 && (
                 <div className="mt-4 rounded-xl border border-gray-100 overflow-hidden">
                   <div className="bg-gray-50 px-3 py-2 border-b border-gray-100">
-                    <p className="text-xs font-bold text-gray-700">🎟️ Canjea tus puntos</p>
+                    <p className="text-xs font-bold text-gray-700">🎟️ {t("bus_rewards_title", lang)}</p>
                   </div>
                   <div className="divide-y divide-gray-50">
                     {business.rewards.map(r => (

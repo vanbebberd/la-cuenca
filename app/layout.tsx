@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Providers } from "@/components/Providers";
 import { Navbar } from "@/components/Navbar";
+import { getLang, t } from "@/lib/i18n";
 
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
 const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
@@ -28,7 +29,8 @@ export const viewport: Viewport = {
   maximumScale: 1,
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const lang = await getLang();
   return (
     <html lang="es" className={`${geistSans.variable} ${geistMono.variable}`}>
       <body className="antialiased bg-white min-h-screen">
@@ -40,7 +42,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
                 <div>
                   <div className="font-black text-gray-900 text-base">La Cuenca</div>
-                  <p className="text-xs text-gray-400 mt-1">El mejor directorio de la cuenca del Lago Llanquihue</p>
+                  <p className="text-xs text-gray-400 mt-1">{t("footer_tagline", lang)}</p>
                 </div>
                 <div className="flex gap-6 text-sm text-gray-400 flex-wrap">
                   <span className="hover:text-gray-600 cursor-default">Puerto Montt</span>
