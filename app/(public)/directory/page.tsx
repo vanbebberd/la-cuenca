@@ -53,7 +53,7 @@ export default async function DirectoryPage({ searchParams }: DirectoryPageProps
       categoryColor: b.category.color ?? "#10b981",
     }));
 
-  const showMap = mapBusinesses.length > 0;
+  const showMap = !!ciudad && mapBusinesses.length > 0;
 
   return (
     <div className="min-h-screen bg-gray-50">
