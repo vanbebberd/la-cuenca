@@ -4,13 +4,14 @@ import { useRouter, useParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { PRICE_RANGES } from "@/lib/constants";
-import { ArrowLeft, Upload, X, ImageIcon, Images } from "lucide-react";
+import { ArrowLeft, Upload, X, ImageIcon, Images, Plus, Trash2 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 
 interface City { id: string; name: string; slug: string; }
 interface Category { id: string; name: string; slug: string; }
 interface HourEntry { dayOfWeek: number; openTime: string; closeTime: string; closed: boolean; }
+interface Reward { id: string; title: string; description?: string | null; pointsCost: number; active: boolean; }
 
 const DAYS_LABELS = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"];
 
@@ -31,6 +32,9 @@ export default function EditBusinessPage() {
   const [uploadingImage, setUploadingImage] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [hours, setHours] = useState<HourEntry[]>(defaultHours());
+  const [rewards, setRewards] = useState<Reward[]>([]);
+  const [newReward, setNewReward] = useState({ title: "", description: "", pointsCost: "" });
+  const [addingReward, setAddingReward] = useState(false);
 
   const [form, setForm] = useState({
     name: "", shortDesc: "", description: "", citySlug: "", categorySlug: "",
@@ -46,7 +50,8 @@ export default function EditBusinessPage() {
       fetch(`/api/admin/businesses/${id}`).then(r => r.json()),
       fetch("/api/admin/cities").then(r => r.json()),
       fetch("/api/admin/categories").then(r => r.json()),
-    ]).then(([business, citiesData, categoriesData]) => {
+      fetch(`/api/admin/businesses/${id}/rewards`).then(r => r.json()),
+    ]).then(([business, citiesData, categoriesData, rewardsData]) => {
       setCities(citiesData);
       setCategories(categoriesData);
       setForm({
@@ -73,6 +78,7 @@ export default function EditBusinessPage() {
         featured: business.featured ?? false,
         plan: business.plan ?? "FREE",
       });
+      setRewards(rewardsData ?? []);
       setHours([0, 1, 2, 3, 4, 5, 6].map((d) => {
         const existing = (business.hours ?? []).find((h: HourEntry) => h.dayOfWeek === d);
         return existing
@@ -141,6 +147,35 @@ export default function EditBusinessPage() {
     } finally {
       setSaving(false);
     }
+  }
+
+  async function handleAddReward(e: React.FormEvent) {
+    e.preventDefault();
+    setAddingReward(true);
+    try {
+      const res = await fetch(`/api/admin/businesses/${id}/rewards`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newReward),
+      });
+      if (!res.ok) throw new Error();
+      const r = await res.json();
+      setRewards(prev => [...prev, r]);
+      setNewReward({ title: "", description: "", pointsCost: "" });
+    } catch {
+      setError("Error creando recompensa");
+    } finally {
+      setAddingReward(false);
+    }
+  }
+
+  async function handleDeleteReward(rewardId: string) {
+    await fetch(`/api/admin/businesses/${id}/rewards`, {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ rewardId }),
+    });
+    setRewards(prev => prev.filter(r => r.id !== rewardId));
   }
 
   const field = (label: string, name: keyof typeof form, type = "text") => (
@@ -297,6 +332,44 @@ export default function EditBusinessPage() {
               <Input name="pointsPerPeso" type="number" step="0.001" value={form.pointsPerPeso} onChange={handleChange} />
             </div>
           )}
+        </div>
+
+        {/* Recompensas */}
+        <div className="space-y-4 border-t border-gray-100 pt-4">
+          <h2 className="text-sm font-semibold text-gray-700 uppercase tracking-wider">Recompensas canjeables</h2>
+          <p className="text-xs text-gray-400">Los clientes pueden canjear sus puntos por estas recompensas.</p>
+
+          {rewards.length > 0 && (
+            <div className="space-y-2">
+              {rewards.map(r => (
+                <div key={r.id} className="flex items-center justify-between px-4 py-3 bg-gray-50 rounded-xl">
+                  <div>
+                    <p className="text-sm font-semibold text-gray-800">{r.title}</p>
+                    <p className="text-xs text-gray-400">
+                      {r.pointsCost.toLocaleString("es-CL")} puntos
+                      {r.description && ` · ${r.description}`}
+                    </p>
+                  </div>
+                  <button type="button" onClick={() => handleDeleteReward(r.id)} className="p-1.5 rounded-lg hover:bg-red-50 text-red-400 hover:text-red-600">
+                    <Trash2 className="h-4 w-4" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+
+          <div className="space-y-3 border-t border-gray-100 pt-3">
+            <p className="text-xs font-medium text-gray-500">Agregar recompensa</p>
+            <div className="grid grid-cols-2 gap-2">
+              <Input placeholder="Título (ej: Café gratis)" value={newReward.title} onChange={e => setNewReward(p => ({ ...p, title: e.target.value }))} />
+              <Input placeholder="Descripción (opcional)" value={newReward.description} onChange={e => setNewReward(p => ({ ...p, description: e.target.value }))} />
+              <Input placeholder="Costo en puntos" type="number" min="1" value={newReward.pointsCost} onChange={e => setNewReward(p => ({ ...p, pointsCost: e.target.value }))} />
+            </div>
+            <Button type="button" size="sm" variant="outline" onClick={handleAddReward} disabled={addingReward || !newReward.title || !newReward.pointsCost}>
+              <Plus className="h-3.5 w-3.5" />
+              {addingReward ? "Agregando..." : "Agregar recompensa"}
+            </Button>
+          </div>
         </div>
 
         {/* Horarios */}

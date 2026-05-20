@@ -38,6 +38,7 @@ export default async function BusinessPage({ params }: Props) {
       city: true,
       photos: { orderBy: { order: "asc" } },
       hours: { orderBy: { dayOfWeek: "asc" } },
+      rewards: { where: { active: true }, orderBy: { pointsCost: "asc" } },
       reviews: {
         include: { user: { select: { name: true, image: true } } },
         orderBy: { createdAt: "desc" },
@@ -310,6 +311,28 @@ export default async function BusinessPage({ params }: Props) {
                 <div className="mt-4 rounded-xl bg-amber-50 border border-amber-100 p-3 text-xs text-amber-800">
                   <p className="font-bold mb-0.5">🎁 Acumula puntos aquí</p>
                   <p className="text-amber-700">Gana {Math.round(business.pointsPerPeso * 1000)} pts por cada $1.000</p>
+                </div>
+              )}
+
+              {/* Rewards */}
+              {business.rewards.length > 0 && (
+                <div className="mt-4 rounded-xl border border-gray-100 overflow-hidden">
+                  <div className="bg-gray-50 px-3 py-2 border-b border-gray-100">
+                    <p className="text-xs font-bold text-gray-700">🎟️ Canjea tus puntos</p>
+                  </div>
+                  <div className="divide-y divide-gray-50">
+                    {business.rewards.map(r => (
+                      <div key={r.id} className="flex items-center justify-between px-3 py-2.5">
+                        <div>
+                          <p className="text-sm font-medium text-gray-800">{r.title}</p>
+                          {r.description && <p className="text-xs text-gray-400">{r.description}</p>}
+                        </div>
+                        <span className="text-xs font-bold text-amber-600 bg-amber-50 border border-amber-100 px-2 py-1 rounded-lg shrink-0 ml-2">
+                          {r.pointsCost.toLocaleString("es-CL")} pts
+                        </span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               )}
             </div>

@@ -184,6 +184,7 @@ model Business {
   events      Event[]
   favorites   Favorite[]
   pointsTx    PointsTransaction[]
+  rewards     Reward[]
 
   avgRating   Float    @default(0)
   reviewCount Int      @default(0)
@@ -353,6 +354,21 @@ model PointsCampaign {
   cityId      String?
   categoryId  String?
   createdAt   DateTime @default(now())
+}
+
+// ─── REWARDS ────────────────────────────────────────────────────────────────
+
+model Reward {
+  id          String   @id @default(cuid())
+  businessId  String
+  business    Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  title       String
+  description String?
+  pointsCost  Int
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+
+  @@index([businessId])
 }
 
 // ─── FAVORITES ──────────────────────────────────────────────────────────────
