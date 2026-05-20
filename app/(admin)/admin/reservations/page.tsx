@@ -2,9 +2,11 @@ import { prisma } from "@/lib/prisma";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { CalendarDays, Users, Clock, CheckCircle, XCircle, Hourglass } from "lucide-react";
+import { ReservationActions } from "./ReservationActions";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = { title: "Admin — Reservas" };
+export const dynamic = "force-dynamic";
 
 const STATUS_CONFIG = {
   PENDING:   { label: "Pendiente",  icon: Hourglass,     bg: "bg-amber-50",   text: "text-amber-700",  border: "border-amber-200" },
@@ -91,13 +93,16 @@ export default async function AdminReservationsPage() {
                         <p className="mt-1.5 text-xs text-gray-400 italic">&quot;{r.notes}&quot;</p>
                       )}
                     </div>
-                    {/* User info */}
-                    <div className="text-right shrink-0">
-                      <p className="text-sm font-medium text-gray-700">{r.user.name ?? "—"}</p>
-                      <p className="text-xs text-gray-400 font-mono">{r.user.email}</p>
-                      <p className="text-xs text-gray-300 mt-1">
-                        {format(new Date(r.createdAt), "d MMM HH:mm", { locale: es })}
-                      </p>
+                    {/* User info + actions */}
+                    <div className="flex flex-col items-end gap-2 shrink-0">
+                      <div className="text-right">
+                        <p className="text-sm font-medium text-gray-700">{r.user.name ?? "—"}</p>
+                        <p className="text-xs text-gray-400 font-mono">{r.user.email}</p>
+                        <p className="text-xs text-gray-300 mt-1">
+                          {format(new Date(r.createdAt), "d MMM HH:mm", { locale: es })}
+                        </p>
+                      </div>
+                      <ReservationActions id={r.id} status={r.status} />
                     </div>
                   </div>
                 </div>

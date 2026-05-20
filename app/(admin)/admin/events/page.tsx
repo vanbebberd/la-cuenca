@@ -1,13 +1,15 @@
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
-import { Plus, Eye, Pencil } from "lucide-react";
+import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
+import { EventActions } from "./EventActions";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = { title: "Admin — Eventos" };
+export const dynamic = "force-dynamic";
 
 export default async function AdminEventsPage() {
   const events = await prisma.event.findMany({
@@ -65,18 +67,7 @@ export default async function AdminEventsPage() {
                     </Badge>
                   </td>
                   <td className="px-4 py-3">
-                    <div className="flex items-center gap-1">
-                      <Link href={`/events/${e.slug}`} target="_blank">
-                        <Button variant="ghost" size="icon" className="h-7 w-7">
-                          <Eye className="h-3.5 w-3.5" />
-                        </Button>
-                      </Link>
-                      <Link href={`/admin/events/${e.id}/edit`}>
-                        <Button variant="ghost" size="icon" className="h-7 w-7">
-                          <Pencil className="h-3.5 w-3.5" />
-                        </Button>
-                      </Link>
-                    </div>
+                    <EventActions id={e.id} slug={e.slug} />
                   </td>
                 </tr>
               );

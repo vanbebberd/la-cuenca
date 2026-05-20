@@ -42,6 +42,17 @@ export default function AdminPlanesPage() {
     setSaving(null);
   }
 
+  async function toggleFeatured(id: string, featured: boolean) {
+    setSaving(id);
+    await fetch(`/api/admin/businesses/${id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ featured }),
+    });
+    setBusinesses((prev) => prev.map((b) => b.id === id ? { ...b, featured } : b));
+    setSaving(null);
+  }
+
   const grouped = {
     PRO:   businesses.filter((b) => b.plan === "PRO"),
     BASIC: businesses.filter((b) => b.plan === "BASIC"),
@@ -81,10 +92,19 @@ export default function AdminPlanesPage() {
                     <p className="text-sm font-semibold text-gray-900 truncate">{b.name}</p>
                     <p className="text-xs text-gray-400">{b.category.name} · {b.city.name}</p>
                   </div>
-                  {b.featured && (
-                    <span className="text-xs bg-amber-50 text-amber-600 border border-amber-100 px-2 py-0.5 rounded-full font-medium shrink-0">
-                      ⭐ Destacado
-                    </span>
+                  {b.plan === "PRO" && (
+                    <button
+                      onClick={() => toggleFeatured(b.id, !b.featured)}
+                      disabled={saving === b.id}
+                      title={b.featured ? "Quitar destacado" : "Marcar como destacado"}
+                      className={`text-xs px-2 py-0.5 rounded-full font-medium border shrink-0 transition-all disabled:opacity-50 ${
+                        b.featured
+                          ? "bg-amber-50 text-amber-600 border-amber-200 hover:bg-amber-100"
+                          : "bg-gray-50 text-gray-400 border-gray-100 hover:bg-amber-50 hover:text-amber-500"
+                      }`}
+                    >
+                      {b.featured ? "⭐ Destacado" : "☆ Destacar"}
+                    </button>
                   )}
                   {/* Quick plan switcher */}
                   <div className="flex gap-1 shrink-0">
