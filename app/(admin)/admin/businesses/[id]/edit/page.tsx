@@ -3,7 +3,7 @@ import { useState, useEffect, useRef } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { PRICE_RANGES } from "@/lib/constants";
+import { PRICE_RANGES, AMENITIES } from "@/lib/constants";
 import { ArrowLeft, Upload, X, ImageIcon, Images, Plus, Trash2 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
@@ -24,6 +24,7 @@ export default function EditBusinessPage() {
   const params = useParams();
   const id = params.id as string;
 
+  const [amenities, setAmenities] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
@@ -78,6 +79,7 @@ export default function EditBusinessPage() {
         featured: business.featured ?? false,
         plan: business.plan ?? "FREE",
       });
+      setAmenities(business.amenities ?? []);
       setRewards(rewardsData ?? []);
       setHours([0, 1, 2, 3, 4, 5, 6].map((d) => {
         const existing = (business.hours ?? []).find((h: HourEntry) => h.dayOfWeek === d);
@@ -125,6 +127,7 @@ export default function EditBusinessPage() {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             ...form,
+            amenities,
             lat: form.lat ? parseFloat(form.lat) : null,
             lng: form.lng ? parseFloat(form.lng) : null,
             pointsPerPeso: parseFloat(form.pointsPerPeso),
@@ -332,6 +335,39 @@ export default function EditBusinessPage() {
               <Input name="pointsPerPeso" type="number" step="0.001" value={form.pointsPerPeso} onChange={handleChange} />
             </div>
           )}
+        </div>
+
+        {/* Amenities */}
+        <div className="space-y-4 border-t border-gray-100 pt-4">
+          <h2 className="text-sm font-semibold text-gray-700 uppercase tracking-wider">Características y servicios</h2>
+          {(["Comodidades", "Servicios", "Ambiente", "Accesibilidad", "Comida"] as const).map(group => {
+            const items = AMENITIES.filter(a => a.group === group);
+            return (
+              <div key={group}>
+                <p className="text-xs font-medium text-gray-400 mb-2">{group}</p>
+                <div className="flex flex-wrap gap-2">
+                  {items.map(a => {
+                    const active = amenities.includes(a.id);
+                    return (
+                      <button
+                        key={a.id}
+                        type="button"
+                        onClick={() => setAmenities(prev => active ? prev.filter(x => x !== a.id) : [...prev, a.id])}
+                        className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium border transition-all ${
+                          active
+                            ? "bg-emerald-50 border-emerald-300 text-emerald-800"
+                            : "bg-gray-50 border-gray-200 text-gray-500 hover:border-gray-300 hover:text-gray-700"
+                        }`}
+                      >
+                        <span>{a.emoji}</span>
+                        {a.label}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            );
+          })}
         </div>
 
         {/* Recompensas */}

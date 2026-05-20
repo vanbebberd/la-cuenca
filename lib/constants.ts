@@ -38,3 +38,23 @@ export const LEVEL_CONFIG = {
 } as const;
 
 export const POINTS_PER_1000 = 10;
+
+export const AMENITIES = [
+  { id: "wifi",           label: "WiFi",                  emoji: "📶", group: "Comodidades" },
+  { id: "ac",             label: "Aire acondicionado",     emoji: "❄️", group: "Comodidades" },
+  { id: "calefaccion",    label: "Calefacción",            emoji: "🔥", group: "Comodidades" },
+  { id: "tv",             label: "TV",                     emoji: "📺", group: "Comodidades" },
+  { id: "tarjetas",       label: "Acepta tarjetas",        emoji: "💳", group: "Servicios" },
+  { id: "estacionamiento",label: "Estacionamiento",        emoji: "🅿️", group: "Servicios" },
+  { id: "para-llevar",    label: "Para llevar",            emoji: "🥡", group: "Servicios" },
+  { id: "delivery",       label: "Delivery",               emoji: "🛵", group: "Servicios" },
+  { id: "reservas",       label: "Acepta reservas",        emoji: "📅", group: "Servicios" },
+  { id: "pet-friendly",   label: "Pet friendly",           emoji: "🐾", group: "Ambiente" },
+  { id: "kids-friendly",  label: "Apto para niños",        emoji: "👶", group: "Ambiente" },
+  { id: "terraza",        label: "Terraza / Exterior",     emoji: "🌿", group: "Ambiente" },
+  { id: "vista-lago",     label: "Vista al lago",          emoji: "🏔️", group: "Ambiente" },
+  { id: "musica",         label: "Música en vivo",         emoji: "🎵", group: "Ambiente" },
+  { id: "accesible",      label: "Acceso silla de ruedas", emoji: "♿", group: "Accesibilidad" },
+  { id: "vegano",         label: "Opciones veganas",       emoji: "🌱", group: "Comida" },
+  { id: "gluten-free",    label: "Sin gluten",             emoji: "🌾", group: "Comida" },
+] as const;

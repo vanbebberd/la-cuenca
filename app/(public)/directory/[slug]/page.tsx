@@ -9,6 +9,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { StarRating } from "@/components/StarRating";
 import { priceRangeLabel, uberDeepLink } from "@/lib/utils";
+import { AMENITIES } from "@/lib/constants";
 import type { Metadata } from "next";
 import { ReservationForm } from "./ReservationForm";
 import { ReviewSection } from "./ReviewSection";
@@ -153,6 +154,25 @@ export default async function BusinessPage({ params }: Props) {
               <section className="bg-white rounded-2xl border border-gray-100 p-6">
                 <h2 className="text-base font-bold text-gray-900 mb-3">Sobre el lugar</h2>
                 <p className="text-gray-600 text-sm leading-relaxed whitespace-pre-line">{business.description}</p>
+              </section>
+            )}
+
+            {/* Amenities */}
+            {business.amenities && business.amenities.length > 0 && (
+              <section className="bg-white rounded-2xl border border-gray-100 p-6">
+                <h2 className="text-base font-bold text-gray-900 mb-4">Características y servicios</h2>
+                <div className="flex flex-wrap gap-2">
+                  {business.amenities.map(id => {
+                    const a = AMENITIES.find(x => x.id === id);
+                    if (!a) return null;
+                    return (
+                      <span key={id} className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gray-50 border border-gray-200 rounded-xl text-sm text-gray-700">
+                        <span>{a.emoji}</span>
+                        {a.label}
+                      </span>
+                    );
+                  })}
+                </div>
               </section>
             )}
 
