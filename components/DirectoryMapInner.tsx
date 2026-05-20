@@ -1,7 +1,6 @@
 "use client";
 import { useEffect, useRef } from "react";
 import L from "leaflet";
-import "leaflet/dist/leaflet.css";
 
 export interface MapBusiness {
   id: string;
@@ -20,16 +19,12 @@ interface Props {
 }
 
 function makeIcon(color: string) {
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 32" width="24" height="32">
-    <path d="M12 0C7.6 0 4 3.6 4 8c0 6 8 16 8 16s8-10 8-16c0-4.4-3.6-8-8-8z" fill="${color}" stroke="white" stroke-width="1.5"/>
-    <circle cx="12" cy="8" r="3.5" fill="white"/>
-  </svg>`;
   return L.divIcon({
-    html: svg,
+    html: `<div style="width:16px;height:16px;border-radius:50%;background:${color};border:3px solid white;box-shadow:0 2px 6px rgba(0,0,0,0.35)"></div>`,
     className: "",
-    iconSize: [24, 32],
-    iconAnchor: [12, 32],
-    popupAnchor: [0, -34],
+    iconSize: [16, 16],
+    iconAnchor: [8, 8],
+    popupAnchor: [0, -12],
   });
 }
 
@@ -55,26 +50,27 @@ export default function DirectoryMapInner({ businesses, centerLat, centerLng }: 
     businesses.forEach((b) => {
       const marker = L.marker([b.lat, b.lng], { icon: makeIcon(b.categoryColor || "#10b981") })
         .addTo(map)
-        .bindPopup(`
-          <div style="min-width:160px">
-            <p style="font-weight:700;font-size:14px;margin:0 0 2px">${b.name}</p>
-            <p style="font-size:12px;color:#6b7280;margin:0 0 6px">${b.categoryName}</p>
+        .bindPopup(
+          `<div style="min-width:150px;font-family:sans-serif">
+            <p style="font-weight:700;font-size:13px;margin:0 0 2px 0;color:#111">${b.name}</p>
+            <p style="font-size:11px;color:#6b7280;margin:0 0 6px 0">${b.categoryName}</p>
             <a href="/directory/${b.slug}" style="font-size:12px;color:#059669;font-weight:600;text-decoration:none">Ver local →</a>
-          </div>
-        `);
+          </div>`
+        );
       markers.push(marker);
     });
 
     if (markers.length > 1) {
       const group = L.featureGroup(markers);
-      map.fitBounds(group.getBounds().pad(0.15));
+      map.fitBounds(group.getBounds().pad(0.2));
     }
 
     return () => {
       map.remove();
       mapRef.current = null;
     };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  return <div ref={containerRef} className="w-full h-full rounded-2xl overflow-hidden z-0" />;
+  return <div ref={containerRef} style={{ width: "100%", height: "100%" }} />;
 }
