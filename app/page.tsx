@@ -14,7 +14,8 @@ import { CATEGORIES } from "@/lib/constants";
 import { HeroSearch } from "@/components/HeroSearch";
 import { prisma } from "@/lib/prisma";
 import { BusinessCard } from "@/components/BusinessCard";
-import { getLang, t } from "@/lib/i18n";
+import { t } from "@/lib/i18n";
+import { getLang } from "@/lib/get-lang";
 
 const ICON_MAP: Record<string, LucideIcon> = {
   UtensilsCrossed, Coffee, BedDouble, Beer, Map,

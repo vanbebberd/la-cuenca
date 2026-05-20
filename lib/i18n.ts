@@ -1,12 +1,5 @@
 export type Lang = "es" | "en" | "pt";
 
-export async function getLang(): Promise<Lang> {
-  const { cookies } = await import("next/headers");
-  const store = await cookies();
-  const v = store.get("lang")?.value;
-  return v === "en" || v === "pt" ? v : "es";
-}
-
 const T = {
   es: {
     // Nav
