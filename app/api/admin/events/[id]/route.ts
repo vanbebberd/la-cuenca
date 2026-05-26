@@ -24,7 +24,8 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     return NextResponse.json({ error: "No autorizado" }, { status: 403 });
   const { id } = await params;
   const body = await req.json();
-  const { citySlug, ...data } = body;
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { citySlug, defaultTicket: _dt, price: _p, capacity: _c, ...data } = body;
 
   let cityId: string | undefined;
   if (citySlug) {

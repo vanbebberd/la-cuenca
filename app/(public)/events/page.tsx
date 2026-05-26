@@ -103,6 +103,7 @@ function EventCard({
     title: string;
     slug: string;
     image?: string | null;
+    isFree: boolean;
     startDate: Date;
     location?: string | null;
     city: { name: string };
@@ -110,10 +111,12 @@ function EventCard({
   };
   featured?: boolean;
 }) {
+  // Precio: si isFree → gratis, si tiene tickets → menor precio, si no → sin info
   const minPrice = event.ticketTypes.length
-    ? Math.min(...event.ticketTypes.map((t: (typeof event.ticketTypes)[number]) => t.price))
+    ? Math.min(...event.ticketTypes.map((t) => t.price))
     : null;
-  const hasAvailability = event.ticketTypes.some((t: (typeof event.ticketTypes)[number]) => t.sold < t.capacity);
+  const isEffectivelyFree = event.isFree || minPrice === 0;
+  const hasAvailability = event.isFree || event.ticketTypes.some((t) => t.sold < t.capacity);
 
   return (
     <Link href={`/events/${event.slug}`} className="group block">
@@ -125,6 +128,18 @@ function EventCard({
             <div className="absolute inset-0 flex items-center justify-center text-4xl">🎭</div>
           )}
           {featured && <Badge className="absolute top-3 left-3">⭐ Destacado</Badge>}
+          {/* Price badge on image */}
+          <div className="absolute top-3 right-3">
+            {isEffectivelyFree ? (
+              <span className="bg-emerald-500 text-white text-xs font-bold px-2.5 py-1 rounded-full">
+                🎉 Gratis
+              </span>
+            ) : minPrice !== null ? (
+              <span className="bg-black/60 text-white text-xs font-bold px-2.5 py-1 rounded-full backdrop-blur-sm">
+                Desde ${minPrice.toLocaleString("es-CL")}
+              </span>
+            ) : null}
+          </div>
           {!hasAvailability && (
             <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
               <Badge variant="secondary">Agotado</Badge>
@@ -144,16 +159,16 @@ function EventCard({
             </div>
           </div>
           <div className="mt-3 flex items-center justify-between">
-            {minPrice !== null ? (
-              <span className="font-semibold text-emerald-700 text-sm">
-                {minPrice === 0 ? "Gratis" : `Desde $${minPrice.toLocaleString("es-CL")}`}
-              </span>
-            ) : (
-              <span className="text-xs text-gray-400">Sin tickets</span>
-            )}
+            <span className={`font-semibold text-sm ${isEffectivelyFree ? "text-emerald-600" : "text-gray-900"}`}>
+              {isEffectivelyFree
+                ? "Entrada gratis"
+                : minPrice !== null
+                  ? `Desde $${minPrice.toLocaleString("es-CL")}`
+                  : ""}
+            </span>
             <Button size="sm" variant="outline" className="text-xs">
               <Ticket className="h-3 w-3" />
-              Ver entradas
+              {isEffectivelyFree ? "Ver evento" : "Ver entradas"}
             </Button>
           </div>
         </div>

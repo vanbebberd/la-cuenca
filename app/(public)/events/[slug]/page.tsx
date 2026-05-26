@@ -96,7 +96,7 @@ export default async function EventPage({ params }: Props) {
 
         {/* Ticket purchase */}
         <div>
-          <TicketPurchase event={event} ticketTypes={event.ticketTypes} />
+          <TicketPurchase event={{ title: event.title, isFree: event.isFree }} ticketTypes={event.ticketTypes} />
         </div>
       </div>
     </div>

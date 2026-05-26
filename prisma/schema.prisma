@@ -278,6 +278,7 @@ model Event {
   location    String?
   lat         Float?
   lng         Float?
+  isFree      Boolean   @default(true)
   published   Boolean   @default(false)
   featured    Boolean   @default(false)
   ticketTypes TicketType[]

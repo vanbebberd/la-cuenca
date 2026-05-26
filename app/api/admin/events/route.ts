@@ -22,7 +22,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "No autorizado" }, { status: 403 });
 
   const body = await req.json();
-  const { citySlug, ...data } = body;
+  const { citySlug, defaultTicket, price: _price, capacity: _capacity, ...data } = body;
 
   const city = await prisma.city.findUnique({ where: { slug: citySlug } });
   if (!city) return NextResponse.json({ error: "Ciudad no encontrada" }, { status: 404 });
@@ -34,7 +34,26 @@ export async function POST(req: NextRequest) {
     .replace(/^-|-$/g, "") + "-" + Date.now();
 
   const event = await prisma.event.create({
-    data: { ...data, slug, cityId: city.id, startDate: new Date(data.startDate), endDate: data.endDate ? new Date(data.endDate) : null },
+    data: {
+      ...data,
+      slug,
+      cityId: city.id,
+      startDate: new Date(data.startDate),
+      endDate: data.endDate ? new Date(data.endDate) : null,
+    },
   });
+
+  // Si es de pago y viene un defaultTicket, crearlo automáticamente
+  if (!data.isFree && defaultTicket?.price) {
+    await prisma.ticketType.create({
+      data: {
+        eventId: event.id,
+        name: defaultTicket.name ?? "Entrada general",
+        price: parseFloat(defaultTicket.price),
+        capacity: defaultTicket.capacity ? parseInt(defaultTicket.capacity) : 100,
+      },
+    });
+  }
+
   return NextResponse.json(event);
 }

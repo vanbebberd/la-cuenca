@@ -15,11 +15,12 @@ interface TicketType {
 }
 
 interface Props {
-  event: { title: string };
+  event: { title: string; isFree: boolean };
   ticketTypes: TicketType[];
 }
 
 export function TicketPurchase({ event, ticketTypes }: Props) {
+  const minPrice = ticketTypes.length ? Math.min(...ticketTypes.map(t => t.price)) : null;
   const { data: session } = useSession();
   const [quantities, setQuantities] = useState<Record<string, number>>({});
   const [loading, setLoading] = useState(false);
@@ -78,6 +79,18 @@ export function TicketPurchase({ event, ticketTypes }: Props) {
   }
 
   if (ticketTypes.length === 0) {
+    // Evento gratuito sin ticket types: mostrar panel informativo
+    if (event.isFree) {
+      return (
+        <div className="bg-white rounded-2xl border border-emerald-100 shadow-sm p-6 text-center">
+          <div className="w-14 h-14 rounded-full bg-emerald-50 flex items-center justify-center mx-auto mb-3">
+            <span className="text-2xl">🎉</span>
+          </div>
+          <p className="font-semibold text-gray-900">Entrada gratuita</p>
+          <p className="text-sm text-gray-500 mt-1">Este evento no requiere ticket. ¡Solo preséntate el día del evento!</p>
+        </div>
+      );
+    }
     return (
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 text-center text-gray-400">
         <Ticket className="h-8 w-8 mx-auto mb-2 opacity-30" />
@@ -88,10 +101,20 @@ export function TicketPurchase({ event, ticketTypes }: Props) {
 
   return (
     <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 sticky top-20">
-      <h2 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
-        <Ticket className="h-4 w-4 text-emerald-600" />
-        Comprar entradas
-      </h2>
+      <div className="mb-4 flex items-start justify-between gap-2">
+        <h2 className="font-semibold text-gray-900 flex items-center gap-2">
+          <Ticket className="h-4 w-4 text-emerald-600" />
+          {event.isFree || minPrice === 0 ? "Entradas gratis" : "Comprar entradas"}
+        </h2>
+        {!event.isFree && minPrice !== null && minPrice > 0 && (
+          <span className="text-sm font-bold text-emerald-700 shrink-0">
+            Desde ${minPrice.toLocaleString("es-CL")}
+          </span>
+        )}
+        {(event.isFree || minPrice === 0) && (
+          <span className="text-xs bg-emerald-100 text-emerald-700 font-semibold px-2 py-0.5 rounded-full">Gratis</span>
+        )}
+      </div>
 
       <div className="space-y-3">
         {ticketTypes.map((t: (typeof ticketTypes)[number]) => {

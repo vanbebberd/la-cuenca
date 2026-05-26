@@ -27,6 +27,7 @@ export default function EditEventPage() {
   const [form, setForm] = useState({
     title: "", description: "", citySlug: "", location: "",
     startDate: "", endDate: "", image: "", published: false, featured: false,
+    isFree: true,
   });
 
   useEffect(() => {
@@ -43,6 +44,7 @@ export default function EditEventPage() {
           image: e.image ?? "",
           published: e.published ?? false,
           featured: e.featured ?? false,
+          isFree: e.isFree ?? true,
         });
         setTicketTypes(e.ticketTypes ?? []);
         setSavedId(e.id);
@@ -98,6 +100,10 @@ export default function EditEventPage() {
       const tt = await res.json();
       setTicketTypes(prev => [...prev, tt]);
       setNewTicket({ name: "", description: "", price: "", capacity: "" });
+      // Si había marcado gratis pero ahora añade tickets de pago → actualizar isFree
+      if (parseFloat(newTicket.price) > 0 && form.isFree) {
+        setForm(p => ({ ...p, isFree: false }));
+      }
     } catch {
       setError("Error creando ticket");
     } finally {
@@ -166,6 +172,36 @@ export default function EditEventPage() {
           <label className="text-xs text-gray-500 mb-1 block">URL imagen</label>
           <Input name="image" type="url" value={form.image} onChange={handleChange} placeholder="https://..." />
         </div>
+
+        {/* Free / Paid toggle */}
+        <div>
+          <label className="text-xs text-gray-500 mb-2 block font-semibold">Tipo de entrada</label>
+          <div className="flex rounded-xl border border-gray-200 overflow-hidden">
+            <button
+              type="button"
+              onClick={() => setForm(p => ({ ...p, isFree: true }))}
+              className={`flex-1 py-2.5 text-sm font-medium transition-colors ${
+                form.isFree
+                  ? "bg-emerald-600 text-white"
+                  : "bg-white text-gray-500 hover:bg-gray-50"
+              }`}
+            >
+              🎉 Gratis
+            </button>
+            <button
+              type="button"
+              onClick={() => setForm(p => ({ ...p, isFree: false }))}
+              className={`flex-1 py-2.5 text-sm font-medium transition-colors border-l border-gray-200 ${
+                !form.isFree
+                  ? "bg-emerald-600 text-white"
+                  : "bg-white text-gray-500 hover:bg-gray-50"
+              }`}
+            >
+              🎟️ De pago
+            </button>
+          </div>
+        </div>
+
         <div className="flex gap-6">
           <label className="flex items-center gap-2 cursor-pointer text-sm text-gray-700">
             <input type="checkbox" name="published" checked={form.published} onChange={handleChange} className="rounded accent-emerald-600" />
@@ -185,9 +221,21 @@ export default function EditEventPage() {
 
       {/* Ticket types */}
       <div className="bg-white rounded-2xl border border-gray-100 p-6 space-y-4">
-        <h2 className="text-sm font-semibold text-gray-700 uppercase tracking-wider">Tipos de ticket</h2>
+        <div className="flex items-center justify-between">
+          <h2 className="text-sm font-semibold text-gray-700 uppercase tracking-wider">Tipos de ticket</h2>
+          {form.isFree && (
+            <span className="text-xs bg-emerald-100 text-emerald-700 px-2 py-1 rounded-full font-medium">Evento gratuito</span>
+          )}
+        </div>
+
         {isNew && !savedId && (
           <p className="text-sm text-gray-400">Guarda el evento primero para agregar tickets.</p>
+        )}
+
+        {!isNew && form.isFree && ticketTypes.length === 0 && (
+          <p className="text-sm text-gray-400">
+            Este evento es gratuito. Si quieres limitar el aforo, agrega un tipo de ticket con precio $0.
+          </p>
         )}
 
         {ticketTypes.length > 0 && (
@@ -196,7 +244,10 @@ export default function EditEventPage() {
               <div key={tt.id} className="flex items-center justify-between px-4 py-3 bg-gray-50 rounded-xl">
                 <div>
                   <p className="text-sm font-semibold text-gray-800">{tt.name}</p>
-                  <p className="text-xs text-gray-400">${tt.price.toLocaleString()} · {tt.sold}/{tt.capacity} vendidos</p>
+                  <p className="text-xs text-gray-400">
+                    {tt.price === 0 ? "Gratis" : `$${tt.price.toLocaleString("es-CL")}`}
+                    {" · "}{tt.sold}/{tt.capacity} vendidos
+                  </p>
                 </div>
                 <button onClick={() => handleDeleteTicket(tt.id)} className="p-1.5 rounded-lg hover:bg-red-50 text-red-400 hover:text-red-600">
                   <Trash2 className="h-4 w-4" />
@@ -210,9 +261,9 @@ export default function EditEventPage() {
           <form onSubmit={handleAddTicket} className="space-y-3 border-t border-gray-100 pt-4">
             <p className="text-xs font-medium text-gray-500">Agregar tipo de ticket</p>
             <div className="grid grid-cols-2 gap-2">
-              <Input placeholder="Nombre (ej: General)" value={newTicket.name} onChange={e => setNewTicket(p => ({ ...p, name: e.target.value }))} required />
+              <Input placeholder="Nombre (ej: General, VIP)" value={newTicket.name} onChange={e => setNewTicket(p => ({ ...p, name: e.target.value }))} required />
               <Input placeholder="Descripción (opcional)" value={newTicket.description} onChange={e => setNewTicket(p => ({ ...p, description: e.target.value }))} />
-              <Input placeholder="Precio ($)" type="number" min="0" value={newTicket.price} onChange={e => setNewTicket(p => ({ ...p, price: e.target.value }))} required />
+              <Input placeholder="Precio ($0 = gratis)" type="number" min="0" value={newTicket.price} onChange={e => setNewTicket(p => ({ ...p, price: e.target.value }))} required />
               <Input placeholder="Capacidad" type="number" min="1" value={newTicket.capacity} onChange={e => setNewTicket(p => ({ ...p, capacity: e.target.value }))} required />
             </div>
             <Button type="submit" size="sm" variant="outline" disabled={addingTicket}>

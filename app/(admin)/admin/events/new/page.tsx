@@ -16,6 +16,7 @@ export default function NewEventPage() {
   const [form, setForm] = useState({
     title: "", description: "", citySlug: "", location: "",
     startDate: "", endDate: "", image: "", published: false, featured: false,
+    isFree: true, price: "", capacity: "",
   });
 
   useEffect(() => {
@@ -32,10 +33,30 @@ export default function NewEventPage() {
     setSaving(true);
     setError("");
     try {
+      const payload = {
+        title: form.title,
+        description: form.description,
+        citySlug: form.citySlug,
+        location: form.location,
+        startDate: form.startDate,
+        endDate: form.endDate,
+        image: form.image,
+        published: form.published,
+        featured: form.featured,
+        isFree: form.isFree,
+        // Si es de pago, pasar precio/capacidad para crear TicketType automático
+        ...(!form.isFree && form.price && {
+          defaultTicket: {
+            name: "Entrada general",
+            price: parseFloat(form.price),
+            capacity: form.capacity ? parseInt(form.capacity) : 100,
+          },
+        }),
+      };
       const res = await fetch("/api/admin/events", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        body: JSON.stringify(payload),
       });
       if (!res.ok) throw new Error((await res.json()).error ?? "Error al guardar");
       const data = await res.json();
@@ -94,6 +115,69 @@ export default function NewEventPage() {
           <label className="text-xs text-gray-500 mb-1 block">URL imagen</label>
           <Input name="image" type="url" value={form.image} onChange={handleChange} placeholder="https://..." />
         </div>
+
+        {/* Free / Paid toggle */}
+        <div>
+          <label className="text-xs text-gray-500 mb-2 block font-semibold">Tipo de entrada</label>
+          <div className="flex rounded-xl border border-gray-200 overflow-hidden">
+            <button
+              type="button"
+              onClick={() => setForm(p => ({ ...p, isFree: true }))}
+              className={`flex-1 py-2.5 text-sm font-medium transition-colors ${
+                form.isFree
+                  ? "bg-emerald-600 text-white"
+                  : "bg-white text-gray-500 hover:bg-gray-50"
+              }`}
+            >
+              🎉 Gratis
+            </button>
+            <button
+              type="button"
+              onClick={() => setForm(p => ({ ...p, isFree: false }))}
+              className={`flex-1 py-2.5 text-sm font-medium transition-colors border-l border-gray-200 ${
+                !form.isFree
+                  ? "bg-emerald-600 text-white"
+                  : "bg-white text-gray-500 hover:bg-gray-50"
+              }`}
+            >
+              🎟️ De pago
+            </button>
+          </div>
+        </div>
+
+        {/* Paid: price + capacity */}
+        {!form.isFree && (
+          <div className="grid grid-cols-2 gap-3 bg-amber-50 border border-amber-100 rounded-xl p-4">
+            <div>
+              <label className="text-xs text-gray-500 mb-1 block">Precio entrada (CLP) *</label>
+              <Input
+                name="price"
+                type="number"
+                min="1"
+                step="100"
+                value={form.price}
+                onChange={handleChange}
+                placeholder="Ej: 5000"
+                required={!form.isFree}
+              />
+            </div>
+            <div>
+              <label className="text-xs text-gray-500 mb-1 block">Capacidad</label>
+              <Input
+                name="capacity"
+                type="number"
+                min="1"
+                value={form.capacity}
+                onChange={handleChange}
+                placeholder="100"
+              />
+            </div>
+            <p className="col-span-2 text-xs text-amber-700">
+              Se creará automáticamente el tipo de ticket &quot;Entrada general&quot;. Podrás agregar más tipos desde la edición del evento.
+            </p>
+          </div>
+        )}
+
         <div className="flex gap-6">
           <label className="flex items-center gap-2 cursor-pointer text-sm text-gray-700">
             <input type="checkbox" name="published" checked={form.published} onChange={handleChange} className="rounded accent-emerald-600" />
