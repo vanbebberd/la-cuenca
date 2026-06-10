@@ -2,11 +2,12 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { LayoutDashboard, Store, Ticket, Gift, Users, Settings, BarChart3, MapPin, Tag, CalendarDays, CreditCard } from "lucide-react";
+import { LayoutDashboard, Store, Ticket, Gift, Users, Settings, BarChart3, MapPin, Tag, CalendarDays, CreditCard, Home } from "lucide-react";
 
 const ADMIN_NAV = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard, adminOnly: false },
   { href: "/admin/businesses", label: "Locales", icon: Store, adminOnly: false },
+  { href: "/admin/rentals", label: "Arriendos", icon: Home, adminOnly: false },
   { href: "/admin/reservations", label: "Reservas", icon: CalendarDays, adminOnly: false },
   { href: "/admin/planes", label: "Planes", icon: CreditCard, adminOnly: true },
   { href: "/admin/events", label: "Eventos", icon: Ticket, adminOnly: false },

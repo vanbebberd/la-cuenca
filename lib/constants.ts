@@ -39,6 +39,29 @@ export const LEVEL_CONFIG = {
 
 export const POINTS_PER_1000 = 10;
 
+export const RENTAL_AMENITIES = [
+  { id: "wifi",           label: "WiFi",               emoji: "📶", group: "Básico" },
+  { id: "cocina",         label: "Cocina equipada",     emoji: "🍳", group: "Básico" },
+  { id: "lavadora",       label: "Lavadora",            emoji: "🫧", group: "Básico" },
+  { id: "tv",             label: "TV",                  emoji: "📺", group: "Básico" },
+  { id: "calefaccion",    label: "Calefacción",         emoji: "🔥", group: "Básico" },
+  { id: "ac",             label: "Aire acondicionado",  emoji: "❄️", group: "Básico" },
+  { id: "estacionamiento",label: "Estacionamiento",     emoji: "🅿️", group: "Básico" },
+  { id: "vista-lago",     label: "Vista al lago",       emoji: "🏔️", group: "Vistas" },
+  { id: "vista-volcan",   label: "Vista al volcán",     emoji: "🌋", group: "Vistas" },
+  { id: "vista-jardin",   label: "Jardín",              emoji: "🌿", group: "Vistas" },
+  { id: "terraza",        label: "Terraza",             emoji: "🌅", group: "Vistas" },
+  { id: "piscina",        label: "Piscina",             emoji: "🏊", group: "Extras" },
+  { id: "jacuzzi",        label: "Jacuzzi / Tina",      emoji: "🛁", group: "Extras" },
+  { id: "parrilla",       label: "Parrilla / BBQ",      emoji: "🔥", group: "Extras" },
+  { id: "bote",           label: "Acceso con bote",     emoji: "🚤", group: "Extras" },
+  { id: "pet-friendly",   label: "Pet friendly",        emoji: "🐾", group: "Reglas" },
+  { id: "no-fumar",       label: "No fumar",            emoji: "🚭", group: "Reglas" },
+  { id: "detector-humo",  label: "Detector de humo",    emoji: "🚨", group: "Seguridad" },
+  { id: "extintor",       label: "Extintor",            emoji: "🧯", group: "Seguridad" },
+  { id: "botiquin",       label: "Botiquín",            emoji: "🩺", group: "Seguridad" },
+] as const;
+
 export const AMENITIES = [
   { id: "wifi",           label: "WiFi",                  emoji: "📶", group: "Comodidades" },
   { id: "ac",             label: "Aire acondicionado",     emoji: "❄️", group: "Comodidades" },
