@@ -85,7 +85,7 @@ export function BusinessChat({ businessId, businessName }: Props) {
         aria-label="Abrir chat"
       >
         <MessageCircle className="h-5 w-5" />
-        <span className="text-sm font-semibold hidden sm:block">Preguntar</span>
+        <span className="text-sm font-semibold hidden sm:block">Habla con Laki</span>
       </button>
 
       {/* Chat window */}
