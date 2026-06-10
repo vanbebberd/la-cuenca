@@ -186,6 +186,10 @@ model Business {
   favorites   Favorite[]
   pointsTx    PointsTransaction[]
   rewards     Reward[]
+  products        Product[]
+  productSections ProductSection[]
+  offers          Offer[]
+  analyticsEvents AnalyticsEvent[]
 
   avgRating   Float    @default(0)
   reviewCount Int      @default(0)
@@ -384,4 +388,72 @@ model Favorite {
   createdAt  DateTime @default(now())
 
   @@unique([userId, businessId])
+}
+
+// ─── PRODUCT CATALOG ────────────────────────────────────────────────────────
+
+model ProductSection {
+  id         String    @id @default(cuid())
+  businessId String
+  business   Business  @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  name       String
+  order      Int       @default(0)
+  products   Product[]
+
+  @@index([businessId])
+}
+
+model Product {
+  id          String          @id @default(cuid())
+  businessId  String
+  business    Business        @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  sectionId   String?
+  section     ProductSection? @relation(fields: [sectionId], references: [id], onDelete: SetNull)
+  name        String
+  description String?
+  price       Float?
+  image       String?
+  available   Boolean         @default(true)
+  order       Int             @default(0)
+  createdAt   DateTime        @default(now())
+
+  @@index([businessId])
+}
+
+// ─── OFFERS ─────────────────────────────────────────────────────────────────
+
+model Offer {
+  id          String    @id @default(cuid())
+  businessId  String
+  business    Business  @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  title       String
+  description String?
+  badge       String?
+  validTo     DateTime?
+  active      Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+
+  @@index([businessId])
+}
+
+// ─── ANALYTICS ──────────────────────────────────────────────────────────────
+
+enum AnalyticsEventType {
+  VIEW
+  WHATSAPP_CLICK
+  CALL_CLICK
+  DIRECTIONS_CLICK
+  RESERVATION
+}
+
+model AnalyticsEvent {
+  id         String             @id @default(cuid())
+  businessId String
+  business   Business           @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  type       AnalyticsEventType
+  createdAt  DateTime           @default(now())
+
+  @@index([businessId])
+  @@index([businessId, type])
+  @@index([createdAt])
 }

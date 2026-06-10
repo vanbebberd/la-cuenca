@@ -85,6 +85,9 @@ const T = {
     bus_today: "hoy",
     bus_day_closed: "Cerrado",
     bus_days: ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"],
+    bus_offers_title: "Ofertas y promociones",
+    bus_offer_valid_until: "Válida hasta",
+    bus_catalog_title: "Carta y servicios",
   },
   en: {
     nav_explore: "Explore",
@@ -166,6 +169,9 @@ const T = {
     bus_today: "today",
     bus_day_closed: "Closed",
     bus_days: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
+    bus_offers_title: "Offers & promotions",
+    bus_offer_valid_until: "Valid until",
+    bus_catalog_title: "Menu & services",
   },
   pt: {
     nav_explore: "Explorar",
@@ -247,6 +253,9 @@ const T = {
     bus_today: "hoje",
     bus_day_closed: "Fechado",
     bus_days: ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"],
+    bus_offers_title: "Ofertas e promoções",
+    bus_offer_valid_until: "Válido até",
+    bus_catalog_title: "Cardápio e serviços",
   },
 } as const;
 

@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import {
   MapPin, Phone, Globe, Link2, MessageCircle, Clock,
-  ExternalLink, Navigation, ChevronRight, CheckCircle2,
+  ExternalLink, Navigation, ChevronRight, CheckCircle2, Tag, ShoppingBag,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { StarRating } from "@/components/StarRating";
@@ -15,6 +15,8 @@ import { getLang } from "@/lib/get-lang";
 import type { Metadata } from "next";
 import { ReservationForm } from "./ReservationForm";
 import { ReviewSection } from "./ReviewSection";
+import { BusinessChat } from "@/components/BusinessChat";
+import { BusinessTracker } from "@/components/BusinessTracker";
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -46,6 +48,15 @@ export default async function BusinessPage({ params }: Props) {
         orderBy: { createdAt: "desc" },
         take: 10,
       },
+      productSections: { orderBy: { order: "asc" } },
+      products: {
+        where: { available: true },
+        orderBy: [{ order: "asc" }],
+      },
+      offers: {
+        where: { active: true },
+        orderBy: { createdAt: "desc" },
+      },
     },
   });
 
@@ -57,8 +68,12 @@ export default async function BusinessPage({ params }: Props) {
   const todayHours = business.hours.find((h) => h.dayOfWeek === today);
   const isOpen = todayHours && !todayHours.closed && todayHours.openTime && todayHours.closeTime;
 
+  const now = new Date();
+  const activeOffers = business.offers.filter((o) => !o.validTo || new Date(o.validTo) >= now);
+
   return (
     <div className="min-h-screen bg-gray-50">
+      <BusinessTracker businessId={business.id} autoTrack="VIEW" />
       {/* Hero image — full width */}
       <div className="relative h-64 sm:h-96 bg-gray-100 overflow-hidden">
         {business.coverImage ? (
@@ -129,7 +144,7 @@ export default async function BusinessPage({ params }: Props) {
             {/* Quick contact buttons */}
             <div className="flex gap-2 shrink-0">
               {business.phone && (
-                <a href={`tel:${business.phone}`}>
+                <a href={`tel:${business.phone}`} onClick={() => { import("@/components/BusinessTracker").then(({ track }) => track(business.id, "CALL_CLICK")); }}>
                   <Button variant="outline" size="sm" className="gap-1.5">
                     <Phone className="h-3.5 w-3.5" />
                     {t("bus_call", lang)}
@@ -137,7 +152,7 @@ export default async function BusinessPage({ params }: Props) {
                 </a>
               )}
               {business.whatsapp && (
-                <a href={`https://wa.me/${business.whatsapp.replace(/\D/g, "")}`} target="_blank" rel="noopener noreferrer">
+                <a href={`https://wa.me/${business.whatsapp.replace(/\D/g, "")}`} target="_blank" rel="noopener noreferrer" onClick={() => { import("@/components/BusinessTracker").then(({ track }) => track(business.id, "WHATSAPP_CLICK")); }}>
                   <Button size="sm" className="gap-1.5 bg-green-600 hover:bg-green-700 text-white">
                     <MessageCircle className="h-3.5 w-3.5" />
                     WhatsApp
@@ -193,6 +208,72 @@ export default async function BusinessPage({ params }: Props) {
                     </div>
                   ))}
                 </div>
+              </section>
+            )}
+
+            {/* Active offers */}
+            {activeOffers.length > 0 && (
+              <section className="bg-white rounded-2xl border border-orange-100 p-6">
+                <h2 className="text-base font-bold text-gray-900 mb-4 flex items-center gap-2">
+                  <Tag className="h-4 w-4 text-orange-500" />
+                  {t("bus_offers_title", lang)}
+                </h2>
+                <div className="space-y-3">
+                  {activeOffers.map((offer) => (
+                    <div key={offer.id} className="flex items-start gap-3 p-3 bg-orange-50 rounded-xl border border-orange-100">
+                      {offer.badge && (
+                        <span className="shrink-0 text-xs font-bold bg-orange-500 text-white px-2 py-1 rounded-lg mt-0.5">
+                          {offer.badge}
+                        </span>
+                      )}
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-semibold text-gray-800">{offer.title}</p>
+                        {offer.description && <p className="text-xs text-gray-500 mt-0.5">{offer.description}</p>}
+                        {offer.validTo && (
+                          <p className="text-xs text-orange-500 mt-1 font-medium">
+                            {t("bus_offer_valid_until", lang)} {new Date(offer.validTo).toLocaleDateString("es-CL")}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </section>
+            )}
+
+            {/* Product catalog */}
+            {business.products.length > 0 && (
+              <section className="bg-white rounded-2xl border border-gray-100 p-6">
+                <h2 className="text-base font-bold text-gray-900 mb-4 flex items-center gap-2">
+                  <ShoppingBag className="h-4 w-4 text-gray-400" />
+                  {t("bus_catalog_title", lang)}
+                </h2>
+                {business.productSections.length > 0 ? (
+                  business.productSections.map((section) => {
+                    const sectionProducts = business.products.filter((p) => p.sectionId === section.id);
+                    if (!sectionProducts.length) return null;
+                    return (
+                      <div key={section.id} className="mb-5 last:mb-0">
+                        <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">{section.name}</p>
+                        <div className="space-y-2">
+                          {sectionProducts.map((product) => <ProductItem key={product.id} product={product} />)}
+                        </div>
+                      </div>
+                    );
+                  })
+                ) : (
+                  <div className="space-y-2">
+                    {business.products.map((product) => <ProductItem key={product.id} product={product} />)}
+                  </div>
+                )}
+                {/* Unsectioned items when sections exist */}
+                {business.productSections.length > 0 && business.products.filter((p) => !p.sectionId).length > 0 && (
+                  <div className="mt-5">
+                    <div className="space-y-2">
+                      {business.products.filter((p) => !p.sectionId).map((product) => <ProductItem key={product.id} product={product} />)}
+                    </div>
+                  </div>
+                )}
               </section>
             )}
 
@@ -314,6 +395,7 @@ export default async function BusinessPage({ params }: Props) {
                     href={`https://www.google.com/maps/search/?api=1&query=${business.lat},${business.lng}`}
                     target="_blank"
                     rel="noopener noreferrer"
+                    onClick={() => { import("@/components/BusinessTracker").then(({ track }) => track(business.id, "DIRECTIONS_CLICK")); }}
                   >
                     <Button variant="outline" size="sm" className="w-full gap-2 justify-start">
                       <MapPin className="h-3.5 w-3.5 text-red-500" />
@@ -365,6 +447,27 @@ export default async function BusinessPage({ params }: Props) {
           </div>
         </div>
       </div>
+
+      <BusinessChat businessId={business.id} businessName={business.name} />
+    </div>
+  );
+}
+
+function ProductItem({ product }: { product: { id: string; name: string; description?: string | null; price?: number | null; image?: string | null } }) {
+  return (
+    <div className="flex items-center gap-3 py-2.5 border-b border-gray-50 last:border-0">
+      {product.image && (
+        <div className="w-14 h-14 rounded-xl overflow-hidden shrink-0 bg-gray-100 relative">
+          <Image src={product.image} alt={product.name} fill className="object-cover" />
+        </div>
+      )}
+      <div className="flex-1 min-w-0">
+        <p className="text-sm font-semibold text-gray-800">{product.name}</p>
+        {product.description && <p className="text-xs text-gray-500 mt-0.5 line-clamp-2">{product.description}</p>}
+      </div>
+      {product.price != null && (
+        <span className="text-sm font-bold text-emerald-700 shrink-0">${product.price.toLocaleString("es-CL")}</span>
+      )}
     </div>
   );
 }

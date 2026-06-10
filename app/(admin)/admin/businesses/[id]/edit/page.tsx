@@ -4,7 +4,7 @@ import { useRouter, useParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { PRICE_RANGES, AMENITIES } from "@/lib/constants";
-import { ArrowLeft, Upload, X, ImageIcon, Images, Plus, Trash2 } from "lucide-react";
+import { ArrowLeft, Upload, X, ImageIcon, Images, Plus, Trash2, Tag, ShoppingBag, BarChart2 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 
@@ -197,6 +197,24 @@ export default function EditBusinessPage() {
           <Button variant="ghost" size="icon"><ArrowLeft className="h-4 w-4" /></Button>
         </Link>
         <h1 className="text-xl font-bold text-gray-900 flex-1">Editar local</h1>
+        <Link href={`/admin/businesses/${id}/analytics`}>
+          <Button variant="outline" size="sm" className="gap-2">
+            <BarChart2 className="h-4 w-4" />
+            Stats
+          </Button>
+        </Link>
+        <Link href={`/admin/businesses/${id}/offers`}>
+          <Button variant="outline" size="sm" className="gap-2">
+            <Tag className="h-4 w-4" />
+            Ofertas
+          </Button>
+        </Link>
+        <Link href={`/admin/businesses/${id}/products`}>
+          <Button variant="outline" size="sm" className="gap-2">
+            <ShoppingBag className="h-4 w-4" />
+            Catálogo
+          </Button>
+        </Link>
         <Link href={`/admin/businesses/${id}/photos`}>
           <Button variant="outline" size="sm" className="gap-2">
             <Images className="h-4 w-4" />
