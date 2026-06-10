@@ -17,6 +17,7 @@ import { ReservationForm } from "./ReservationForm";
 import { ReviewSection } from "./ReviewSection";
 import { BusinessChat } from "@/components/BusinessChat";
 import { BusinessTracker } from "@/components/BusinessTracker";
+import { TrackedLink } from "@/components/TrackedLink";
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -144,20 +145,20 @@ export default async function BusinessPage({ params }: Props) {
             {/* Quick contact buttons */}
             <div className="flex gap-2 shrink-0">
               {business.phone && (
-                <a href={`tel:${business.phone}`} onClick={() => { import("@/components/BusinessTracker").then(({ track }) => track(business.id, "CALL_CLICK")); }}>
+                <TrackedLink href={`tel:${business.phone}`} businessId={business.id} event="CALL_CLICK">
                   <Button variant="outline" size="sm" className="gap-1.5">
                     <Phone className="h-3.5 w-3.5" />
                     {t("bus_call", lang)}
                   </Button>
-                </a>
+                </TrackedLink>
               )}
               {business.whatsapp && (
-                <a href={`https://wa.me/${business.whatsapp.replace(/\D/g, "")}`} target="_blank" rel="noopener noreferrer" onClick={() => { import("@/components/BusinessTracker").then(({ track }) => track(business.id, "WHATSAPP_CLICK")); }}>
+                <TrackedLink href={`https://wa.me/${business.whatsapp.replace(/\D/g, "")}`} businessId={business.id} event="WHATSAPP_CLICK" target="_blank" rel="noopener noreferrer">
                   <Button size="sm" className="gap-1.5 bg-green-600 hover:bg-green-700 text-white">
                     <MessageCircle className="h-3.5 w-3.5" />
                     WhatsApp
                   </Button>
-                </a>
+                </TrackedLink>
               )}
             </div>
           </div>
@@ -391,17 +392,12 @@ export default async function BusinessPage({ params }: Props) {
                     />
                   </div>
                   {/* Action buttons */}
-                  <a
-                    href={`https://www.google.com/maps/search/?api=1&query=${business.lat},${business.lng}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    onClick={() => { import("@/components/BusinessTracker").then(({ track }) => track(business.id, "DIRECTIONS_CLICK")); }}
-                  >
+                  <TrackedLink href={`https://www.google.com/maps/search/?api=1&query=${business.lat},${business.lng}`} businessId={business.id} event="DIRECTIONS_CLICK" target="_blank" rel="noopener noreferrer">
                     <Button variant="outline" size="sm" className="w-full gap-2 justify-start">
                       <MapPin className="h-3.5 w-3.5 text-red-500" />
                       {t("bus_open_maps", lang)}
                     </Button>
-                  </a>
+                  </TrackedLink>
                   <a href={uberDeepLink(business.lat, business.lng, business.name)} target="_blank" rel="noopener noreferrer">
                     <Button variant="secondary" size="sm" className="w-full gap-2 justify-start mt-2">
                       <Navigation className="h-3.5 w-3.5" />
