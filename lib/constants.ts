@@ -62,6 +62,37 @@ export const RENTAL_AMENITIES = [
   { id: "botiquin",       label: "Botiquín",            emoji: "🩺", group: "Seguridad" },
 ] as const;
 
+export const ACTIVITY_CATEGORIES = [
+  { id: "tour",       label: "Tour guiado",          emoji: "🧭" },
+  { id: "hike",       label: "Caminata / Trekking",  emoji: "🥾" },
+  { id: "bike",       label: "Paseo en bicicleta",   emoji: "🚴" },
+  { id: "kayak",      label: "Kayak / Canotaje",     emoji: "🛶" },
+  { id: "horseback",  label: "Cabalgata",             emoji: "🐴" },
+  { id: "fishing",    label: "Pesca deportiva",       emoji: "🎣" },
+  { id: "climbing",   label: "Escalada",              emoji: "🧗" },
+  { id: "paragliding",label: "Parapente",             emoji: "🪂" },
+  { id: "rafting",    label: "Rafting",               emoji: "🌊" },
+  { id: "other",      label: "Otro",                  emoji: "🌿" },
+] as const;
+
+export const ACTIVITY_INCLUDES = [
+  "Guía especializado",
+  "Equipo / Material incluido",
+  "Snack / Refrigerio",
+  "Almuerzo",
+  "Transporte incluido",
+  "Seguro de accidentes",
+  "Fotos del tour",
+  "Chaleco salvavidas",
+] as const;
+
+export const DIFFICULTY_LABELS: Record<string, { label: string; color: string }> = {
+  EASY:        { label: "Fácil",          color: "emerald" },
+  MODERATE:    { label: "Moderado",       color: "amber" },
+  CHALLENGING: { label: "Desafiante",     color: "orange" },
+  EXPERT:      { label: "Experto",        color: "red" },
+};
+
 export const AMENITIES = [
   { id: "wifi",           label: "WiFi",                  emoji: "📶", group: "Comodidades" },
   { id: "ac",             label: "Aire acondicionado",     emoji: "❄️", group: "Comodidades" },

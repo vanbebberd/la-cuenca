@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { useSession, signOut } from "next-auth/react";
 import { useState, useEffect } from "react";
-import { Menu, X, MapPin, Ticket, Gift, LayoutDashboard, LogIn, Sparkles, Home } from "lucide-react";
+import { Menu, X, MapPin, Ticket, Gift, LayoutDashboard, LogIn, Sparkles, Home, Mountain } from "lucide-react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
@@ -22,7 +22,8 @@ export function Navbar() {
 
   const NAV_LINKS = [
     { href: "/directory", label: t("nav_explore", lang), icon: MapPin },
-    { href: "/rentals",   label: "Arriendos",             icon: Home },
+    { href: "/rentals",    label: "Arriendos",              icon: Home },
+    { href: "/activities", label: "Actividades",            icon: Mountain },
     { href: "/panorama",  label: "Laki",                  icon: Sparkles },
     { href: "/events",    label: t("nav_events", lang),   icon: Ticket },
     { href: "/wallet",    label: t("nav_points", lang),   icon: Gift },

@@ -113,6 +113,7 @@ model User {
   favorites        Favorite[]
   ownedBusiness    Business[]
   propertyBookings PropertyBooking[]
+  activityBookings ActivityBooking[]
 }
 
 // ─── CATALOG ────────────────────────────────────────────────────────────────
@@ -129,6 +130,7 @@ model City {
   businesses  Business[]
   events      Event[]
   properties  Property[]
+  activities  Activity[]
 }
 
 model Category {
@@ -565,4 +567,123 @@ model PropertyBlockedDate {
 
   @@unique([propertyId, date])
   @@index([propertyId])
+}
+
+// ─── OUTDOOR ACTIVITIES ─────────────────────────────────────────────────────
+
+enum ActivityStatus {
+  ACTIVE
+  INACTIVE
+  DRAFT
+}
+
+enum ActivityBookingStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+  COMPLETED
+  REFUNDED
+}
+
+enum DifficultyLevel {
+  EASY
+  MODERATE
+  CHALLENGING
+  EXPERT
+}
+
+model Activity {
+  id                 String          @id @default(cuid())
+  title              String
+  slug               String          @unique
+  description        String?         @db.Text
+  shortDesc          String?
+  status             ActivityStatus  @default(DRAFT)
+  featured           Boolean         @default(false)
+
+  cityId             String
+  city               City            @relation(fields: [cityId], references: [id])
+
+  category           String
+  difficulty         DifficultyLevel?
+  duration           String
+  pricePerPerson     Float
+  minParticipants    Int             @default(1)
+  maxParticipants    Int             @default(10)
+  platformFeePercent Float           @default(10)
+
+  meetingPoint       String?
+  lat                Float?
+  lng                Float?
+
+  includes           String[]
+  excludes           String[]
+  requirements       String?
+
+  coverImage         String?
+  photos             ActivityPhoto[]
+  sessions           ActivitySession[]
+
+  createdAt          DateTime        @default(now())
+  updatedAt          DateTime        @updatedAt
+
+  @@index([cityId])
+  @@index([slug])
+  @@index([status])
+}
+
+model ActivityPhoto {
+  id         String   @id @default(cuid())
+  activityId String
+  activity   Activity @relation(fields: [activityId], references: [id], onDelete: Cascade)
+  url        String
+  alt        String?
+  order      Int      @default(0)
+  createdAt  DateTime @default(now())
+
+  @@index([activityId])
+}
+
+model ActivitySession {
+  id              String            @id @default(cuid())
+  activityId      String
+  activity        Activity          @relation(fields: [activityId], references: [id], onDelete: Cascade)
+  date            DateTime          @db.Date
+  startTime       String
+  endTime         String?
+  maxParticipants Int
+  booked          Int               @default(0)
+  active          Boolean           @default(true)
+  bookings        ActivityBooking[]
+
+  @@index([activityId])
+  @@index([date])
+}
+
+model ActivityBooking {
+  id            String                @id @default(cuid())
+  sessionId     String
+  session       ActivitySession       @relation(fields: [sessionId], references: [id])
+  userId        String?
+  user          User?                 @relation(fields: [userId], references: [id])
+
+  participants  Int
+  activityPrice Float
+  platformFee   Float
+  totalPrice    Float
+
+  status        ActivityBookingStatus @default(PENDING)
+  mpPaymentId   String?
+  confirmCode   String                @unique @default(cuid())
+
+  guestName     String
+  guestEmail    String
+  guestPhone    String?
+  notes         String?
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([sessionId])
+  @@index([userId])
 }
