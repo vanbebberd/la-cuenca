@@ -36,7 +36,7 @@ function isOpenNow(hours?: BusinessCardProps["business"]["hours"]): boolean | nu
 
 export function BusinessCard({ business }: BusinessCardProps) {
   const open = isOpenNow(business.hours);
-  const color = "#10b981";
+  const color = business.category.color ?? "#10b981";
 
   return (
     <Link href={`/directory/${business.slug}`} className="group block h-full">
@@ -91,7 +91,7 @@ export function BusinessCard({ business }: BusinessCardProps) {
           )}
         </div>
 
-        <div className="h-0.5 w-full bg-emerald-400" />
+        <div className="h-0.5 w-full" style={{ backgroundColor: color }} />
 
         {/* Body */}
         <div className="flex flex-col flex-1 p-5">
