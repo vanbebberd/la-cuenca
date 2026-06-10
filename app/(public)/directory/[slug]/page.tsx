@@ -213,7 +213,7 @@ export default async function BusinessPage({ params }: Props) {
             )}
 
             {/* Active offers */}
-            {activeOffers.length > 0 && (
+            {business.plan === "PRO" && activeOffers.length > 0 && (
               <section className="bg-white rounded-2xl border border-orange-100 p-6">
                 <h2 className="text-base font-bold text-gray-900 mb-4 flex items-center gap-2">
                   <Tag className="h-4 w-4 text-orange-500" />
@@ -243,7 +243,7 @@ export default async function BusinessPage({ params }: Props) {
             )}
 
             {/* Product catalog */}
-            {business.products.length > 0 && (
+            {business.plan === "PRO" && business.products.length > 0 && (
               <section className="bg-white rounded-2xl border border-gray-100 p-6">
                 <h2 className="text-base font-bold text-gray-900 mb-4 flex items-center gap-2">
                   <ShoppingBag className="h-4 w-4 text-gray-400" />
