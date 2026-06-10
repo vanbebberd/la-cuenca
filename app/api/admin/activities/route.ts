@@ -20,35 +20,48 @@ export async function GET() {
 }
 
 export async function POST(req: Request) {
-  const session = await getServerSession(authOptions);
-  if (!isAdmin(session)) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  try {
+    const session = await getServerSession(authOptions);
+    if (!isAdmin(session)) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const body = await req.json();
-  const { title, citySlug, category, difficulty, duration, pricePerPerson, minParticipants, maxParticipants,
-    platformFeePercent, description, shortDesc, meetingPoint, lat, lng, includes, excludes, requirements } = body;
+    const body = await req.json();
+    const { title, citySlug, category, difficulty, duration, pricePerPerson, minParticipants, maxParticipants,
+      platformFeePercent, description, shortDesc, meetingPoint, lat, lng, includes, excludes, requirements } = body;
 
-  const city = await prisma.city.findUnique({ where: { slug: citySlug } });
-  if (!city) return NextResponse.json({ error: "Ciudad no encontrada" }, { status: 400 });
+    const city = await prisma.city.findUnique({ where: { slug: citySlug } });
+    if (!city) return NextResponse.json({ error: "Ciudad no encontrada" }, { status: 400 });
 
-  let slug = slugify(title);
-  let i = 0;
-  while (await prisma.activity.findUnique({ where: { slug } })) {
-    slug = `${slugify(title)}-${++i}`;
+    let slug = slugify(title);
+    let i = 0;
+    while (await prisma.activity.findUnique({ where: { slug } })) {
+      slug = `${slugify(title)}-${++i}`;
+    }
+
+    const activity = await prisma.activity.create({
+      data: {
+        title,
+        slug,
+        description: description || null,
+        shortDesc: shortDesc || null,
+        category,
+        difficulty: difficulty || null,
+        duration,
+        pricePerPerson: parseFloat(pricePerPerson),
+        minParticipants: parseInt(minParticipants) || 1,
+        maxParticipants: parseInt(maxParticipants) || 10,
+        platformFeePercent: parseFloat(platformFeePercent) || 10,
+        meetingPoint: meetingPoint || null,
+        lat: lat ? parseFloat(lat) : null,
+        lng: lng ? parseFloat(lng) : null,
+        includes: includes ?? [],
+        excludes: excludes ?? [],
+        requirements: requirements || null,
+        cityId: city.id,
+      },
+    });
+    return NextResponse.json(activity, { status: 201 });
+  } catch (e: any) {
+    console.error("POST /api/admin/activities:", e);
+    return NextResponse.json({ error: e?.message ?? "Error interno" }, { status: 500 });
   }
-
-  const activity = await prisma.activity.create({
-    data: {
-      title, slug, description, shortDesc, category,
-      difficulty: difficulty || undefined,
-      duration, pricePerPerson: parseFloat(pricePerPerson),
-      minParticipants: parseInt(minParticipants) || 1,
-      maxParticipants: parseInt(maxParticipants) || 10,
-      platformFeePercent: parseFloat(platformFeePercent) || 10,
-      meetingPoint, lat: lat ? parseFloat(lat) : undefined, lng: lng ? parseFloat(lng) : undefined,
-      includes: includes ?? [], excludes: excludes ?? [],
-      requirements,
-      cityId: city.id,
-    },
-  });
-  return NextResponse.json(activity, { status: 201 });
 }

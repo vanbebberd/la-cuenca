@@ -30,8 +30,9 @@ export default function NewActivityPage() {
       const data = await res.json();
       router.push(`/admin/activities/${data.id}/edit`);
     } else {
-      const d = await res.json();
-      setError(d.error ?? "Error al crear");
+      let msg = "Error al crear";
+      try { const d = await res.json(); msg = d.error ?? msg; } catch {}
+      setError(msg);
       setSaving(false);
     }
   }
