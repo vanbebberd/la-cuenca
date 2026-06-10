@@ -444,7 +444,7 @@ export default async function BusinessPage({ params }: Props) {
         </div>
       </div>
 
-      <BusinessChat businessId={business.id} businessName={business.name} />
+      {business.plan === "PRO" && <BusinessChat businessId={business.id} businessName={business.name} />}
     </div>
   );
 }
