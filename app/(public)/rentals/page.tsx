@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import Image from "next/image";
 import Link from "next/link";
-import { MapPin, Users, BedDouble, Bath, Star } from "lucide-react";
+import { MapPin, Users, BedDouble, Bath, Star, Home } from "lucide-react";
 import { formatPrice } from "@/lib/utils";
 import { CITIES } from "@/lib/constants";
 
@@ -60,7 +60,9 @@ export default async function RentalsPage({ searchParams }: { searchParams: Prom
                     {p.photos[0] ? (
                       <Image src={p.photos[0].url} alt={p.title} fill className="object-cover group-hover:scale-105 transition-transform duration-300" />
                     ) : (
-                      <div className="absolute inset-0 flex items-center justify-center text-5xl opacity-20">🏠</div>
+                      <div className="absolute inset-0 flex items-center justify-center bg-emerald-50">
+                        <Home className="h-12 w-12 text-emerald-200" strokeWidth={1} />
+                      </div>
                     )}
                     {p.featured && (
                       <span className="absolute top-3 left-3 bg-amber-500 text-white text-xs font-bold px-2.5 py-1 rounded-full flex items-center gap-1">

@@ -1,10 +1,23 @@
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import Image from "next/image";
-import { MapPin, Users, Clock, ChevronRight } from "lucide-react";
+import { MapPin, Users, Clock, ChevronRight, Compass, Mountain, Bike, Waves, Wind, Fish, Leaf, type LucideIcon } from "lucide-react";
 import { ACTIVITY_CATEGORIES, DIFFICULTY_LABELS, CITIES } from "@/lib/constants";
 import { formatPrice } from "@/lib/utils";
 import type { Metadata } from "next";
+
+const ACTIVITY_ICONS: Record<string, LucideIcon> = {
+  tour:       Compass,
+  hike:       Mountain,
+  bike:       Bike,
+  kayak:      Waves,
+  horseback:  Wind,
+  fishing:    Fish,
+  climbing:   Mountain,
+  paragliding:Wind,
+  rafting:    Waves,
+  other:      Leaf,
+};
 
 export const metadata: Metadata = {
   title: "Actividades Outdoor | La Cuenca",
@@ -52,15 +65,19 @@ export default async function ActivitiesPage({ searchParams }: Props) {
       <div className="max-w-5xl mx-auto px-4 py-8">
         {/* Filters */}
         <div className="flex flex-wrap gap-2 mb-6">
-          <Link href="/activities" className={`text-xs px-3 py-1.5 rounded-full border transition-colors ${!sp.category ? "bg-emerald-600 text-white border-emerald-600" : "bg-white border-gray-200 text-gray-600 hover:border-emerald-300"}`}>
-            Todas
+          <Link href="/activities" className={`inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full border transition-colors ${!sp.category ? "bg-emerald-600 text-white border-emerald-600" : "bg-white border-gray-200 text-gray-600 hover:border-emerald-300"}`}>
+            <Leaf className="h-3 w-3" />Todas
           </Link>
-          {ACTIVITY_CATEGORIES.map((c) => (
-            <Link key={c.id} href={`/activities?category=${c.id}${sp.city ? `&city=${sp.city}` : ""}`}
-              className={`text-xs px-3 py-1.5 rounded-full border transition-colors ${sp.category === c.id ? "bg-emerald-600 text-white border-emerald-600" : "bg-white border-gray-200 text-gray-600 hover:border-emerald-300"}`}>
-              {c.emoji} {c.label}
-            </Link>
-          ))}
+          {ACTIVITY_CATEGORIES.map((c) => {
+            const Icon = ACTIVITY_ICONS[c.id] ?? Leaf;
+            const active = sp.category === c.id;
+            return (
+              <Link key={c.id} href={`/activities?category=${c.id}${sp.city ? `&city=${sp.city}` : ""}`}
+                className={`inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full border transition-colors ${active ? "bg-emerald-600 text-white border-emerald-600" : "bg-white border-gray-200 text-gray-600 hover:border-emerald-300"}`}>
+                <Icon className="h-3 w-3" />{c.label}
+              </Link>
+            );
+          })}
         </div>
 
         {/* City filter */}
@@ -108,27 +125,30 @@ function ActivityCard({ activity: a, large }: { activity: any; large?: boolean }
   const cat = ACTIVITY_CATEGORIES.find((c) => c.id === a.category);
   const diff = a.difficulty ? DIFFICULTY_LABELS[a.difficulty] : null;
   const photo = a.photos[0];
+  const Icon = ACTIVITY_ICONS[a.category] ?? Leaf;
 
   return (
     <Link href={`/activities/${a.slug}`} className="group bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all block">
-      <div className={`relative bg-gray-100 ${large ? "h-52" : "h-40"}`}>
+      <div className={`relative bg-emerald-50 ${large ? "h-52" : "h-40"}`}>
         {photo ? (
           <Image src={photo.url} alt={photo.alt ?? a.title} fill className="object-cover group-hover:scale-105 transition-transform duration-300" />
         ) : (
-          <div className="h-full flex items-center justify-center text-5xl opacity-30">{cat?.emoji ?? "🌿"}</div>
+          <div className="h-full flex items-center justify-center">
+            <Icon className="h-12 w-12 text-emerald-200" strokeWidth={1} />
+          </div>
         )}
         {a.featured && (
           <span className="absolute top-2 left-2 bg-amber-400 text-amber-900 text-xs font-bold px-2 py-0.5 rounded-full">Destacada</span>
         )}
         {diff && (
-          <span className={`absolute top-2 right-2 text-xs px-2 py-0.5 rounded-full font-medium bg-white/90 text-${diff.color}-700`}>
+          <span className="absolute top-2 right-2 text-xs px-2 py-0.5 rounded-full font-medium bg-white/90 text-gray-700">
             {diff.label}
           </span>
         )}
       </div>
       <div className="p-4">
         <div className="flex items-center gap-1.5 text-xs text-emerald-600 mb-1.5">
-          <span>{cat?.emoji}</span>
+          <Icon className="h-3 w-3" />
           <span>{cat?.label}</span>
         </div>
         <h3 className="font-bold text-gray-900 mb-1 line-clamp-2 group-hover:text-emerald-700 transition-colors">{a.title}</h3>

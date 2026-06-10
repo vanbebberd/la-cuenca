@@ -1,8 +1,14 @@
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Plus, MapPin, Users, CalendarDays, Edit, Mountain } from "lucide-react";
+import { Plus, MapPin, Users, CalendarDays, Edit, Mountain, Compass, Bike, Waves, Wind, Fish, Leaf, type LucideIcon } from "lucide-react";
 import { ACTIVITY_CATEGORIES } from "@/lib/constants";
+
+const ACTIVITY_ICONS: Record<string, LucideIcon> = {
+  tour: Compass, hike: Mountain, bike: Bike, kayak: Waves,
+  horseback: Wind, fishing: Fish, climbing: Mountain,
+  paragliding: Wind, rafting: Waves, other: Leaf,
+};
 
 const STATUS_LABELS: Record<string, { label: string; class: string }> = {
   ACTIVE:   { label: "Activa",   class: "bg-emerald-50 text-emerald-700" },
@@ -43,9 +49,11 @@ export default async function ActivitiesPage() {
             const s = STATUS_LABELS[a.status] ?? STATUS_LABELS.DRAFT;
             return (
               <div key={a.id} className="bg-white rounded-2xl border border-gray-100 p-4 flex items-center gap-4">
-                <div className="w-14 h-14 rounded-xl bg-emerald-50 flex items-center justify-center text-2xl shrink-0">
-                  {cat?.emoji ?? "🌿"}
-                </div>
+                {(() => { const Icon = ACTIVITY_ICONS[a.category] ?? Leaf; return (
+                  <div className="w-14 h-14 rounded-xl bg-emerald-50 flex items-center justify-center shrink-0">
+                    <Icon className="h-6 w-6 text-emerald-600" strokeWidth={1.5} />
+                  </div>
+                ); })()}
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-0.5">
                     <p className="font-semibold text-gray-900 truncate">{a.title}</p>

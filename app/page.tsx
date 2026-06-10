@@ -95,7 +95,7 @@ export default async function HomePage() {
                   href={`/directory?categoria=${cat.slug}`}
                   className="group flex flex-col items-center gap-2.5 px-3 py-5 rounded-xl hover:bg-gray-50 transition-colors duration-150"
                 >
-                  <Icon className="h-8 w-8 text-slate-600 group-hover:text-slate-900 transition-colors" strokeWidth={1.5} />
+                  <Icon className="h-8 w-8 text-emerald-600 group-hover:text-emerald-700 transition-colors" strokeWidth={1.5} />
                   <span className="text-[11px] font-medium text-gray-500 group-hover:text-gray-800 transition-colors text-center leading-tight">{cat.name}</span>
                 </Link>
               );

@@ -2,7 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
-import { MapPin, Users, BedDouble, Bath, ChevronRight, Bed } from "lucide-react";
+import { MapPin, Users, BedDouble, Bath, ChevronRight, Bed, Home } from "lucide-react";
 import { RENTAL_AMENITIES } from "@/lib/constants";
 import { formatPrice } from "@/lib/utils";
 import type { Metadata } from "next";
@@ -41,7 +41,9 @@ export default async function RentalDetailPage({ params }: Props) {
             )}
           </div>
         ) : (
-          <div className="h-64 sm:h-80 flex items-center justify-center text-8xl opacity-20 bg-gray-100">🏠</div>
+          <div className="h-64 sm:h-80 flex items-center justify-center bg-emerald-50">
+            <Home className="h-24 w-24 text-emerald-200" strokeWidth={0.8} />
+          </div>
         )}
       </div>
 

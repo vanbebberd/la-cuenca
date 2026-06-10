@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { MapPin, CheckCircle2, Star } from "lucide-react";
+import { MapPin, CheckCircle2, Star, Store } from "lucide-react";
 import { priceRangeLabel } from "@/lib/utils";
 
 interface BusinessCardProps {
@@ -36,7 +36,7 @@ function isOpenNow(hours?: BusinessCardProps["business"]["hours"]): boolean | nu
 
 export function BusinessCard({ business }: BusinessCardProps) {
   const open = isOpenNow(business.hours);
-  const color = business.category.color ?? "#10b981";
+  const color = "#10b981";
 
   return (
     <Link href={`/directory/${business.slug}`} className="group block h-full">
@@ -53,8 +53,8 @@ export function BusinessCard({ business }: BusinessCardProps) {
               sizes="(max-width: 640px) 100vw, 360px"
             />
           ) : (
-            <div className="absolute inset-0 flex items-center justify-center" style={{ backgroundColor: `${color}15` }}>
-              <span className="text-5xl opacity-30">🏪</span>
+            <div className="absolute inset-0 flex items-center justify-center bg-emerald-50">
+              <Store className="h-14 w-14 text-emerald-200" strokeWidth={1} />
             </div>
           )}
 
@@ -91,8 +91,7 @@ export function BusinessCard({ business }: BusinessCardProps) {
           )}
         </div>
 
-        {/* Colored accent line */}
-        <div className="h-0.5 w-full" style={{ backgroundColor: color }} />
+        <div className="h-0.5 w-full bg-emerald-400" />
 
         {/* Body */}
         <div className="flex flex-col flex-1 p-5">
