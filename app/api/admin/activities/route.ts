@@ -41,6 +41,7 @@ export async function POST(req: Request) {
       data: {
         title,
         slug,
+        status: "ACTIVE",
         description: description || null,
         shortDesc: shortDesc || null,
         category,
