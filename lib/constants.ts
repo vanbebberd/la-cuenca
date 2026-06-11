@@ -17,7 +17,7 @@ export const CATEGORIES = [
   { name: "Tiendas", slug: "tiendas", icon: "ShoppingBag", color: "#ec4899" },
   { name: "Delivery", slug: "delivery", icon: "Bike", color: "#f97316" },
   { name: "Cervecerías", slug: "cervecerias", icon: "GlassWater", color: "#d97706" },
-  { name: "Wellness", slug: "wellness", icon: "Heart", color: "#14b8a6" },
+  { name: "Spa & Wellness", slug: "wellness", icon: "Heart", color: "#14b8a6" },
   { name: "Servicios", slug: "servicios", icon: "Wrench", color: "#6b7280" },
   { name: "Panoramas", slug: "panoramas", icon: "Camera", color: "#06b6d4" },
   { name: "Tours", slug: "tours", icon: "Compass", color: "#0ea5e9" },
