@@ -19,6 +19,8 @@ const ACTIVITY_ICONS: Record<string, LucideIcon> = {
   other:      Leaf,
 };
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "Actividades Outdoor | La Cuenca",
   description: "Tours, trekking, kayak, cabalgatas y más actividades outdoor en el Lago Llanquihue.",
