@@ -193,6 +193,7 @@ model Business {
   products        Product[]
   productSections ProductSection[]
   offers          Offer[]
+  coupons         Coupon[]
   analyticsEvents AnalyticsEvent[]
 
   avgRating   Float    @default(0)
@@ -438,6 +439,29 @@ model Offer {
   createdAt   DateTime  @default(now())
 
   @@index([businessId])
+}
+
+// ─── COUPONS ────────────────────────────────────────────────────────────────
+
+model Coupon {
+  id            String    @id @default(cuid())
+  businessId    String
+  business      Business  @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  code          String    @unique
+  title         String
+  description   String?
+  discountType  String    // "PERCENT" | "FIXED"
+  discountValue Float
+  minPurchase   Float?
+  maxUses       Int?
+  usedCount     Int       @default(0)
+  validFrom     DateTime?
+  validTo       DateTime?
+  active        Boolean   @default(true)
+  createdAt     DateTime  @default(now())
+
+  @@index([businessId])
+  @@index([code])
 }
 
 // ─── ANALYTICS ──────────────────────────────────────────────────────────────

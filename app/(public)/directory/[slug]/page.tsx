@@ -18,6 +18,7 @@ import { ReviewSection } from "./ReviewSection";
 import { BusinessChat } from "@/components/BusinessChat";
 import { BusinessTracker } from "@/components/BusinessTracker";
 import { TrackedLink } from "@/components/TrackedLink";
+import { CouponsSection } from "./CouponsSection";
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -55,6 +56,10 @@ export default async function BusinessPage({ params }: Props) {
         orderBy: [{ order: "asc" }],
       },
       offers: {
+        where: { active: true },
+        orderBy: { createdAt: "desc" },
+      },
+      coupons: {
         where: { active: true },
         orderBy: { createdAt: "desc" },
       },
@@ -240,6 +245,13 @@ export default async function BusinessPage({ params }: Props) {
                   ))}
                 </div>
               </section>
+            )}
+
+            {/* Coupons */}
+            {business.plan === "PRO" && (
+              <CouponsSection
+                coupons={business.coupons.filter((c) => !c.validTo || new Date(c.validTo) >= new Date())}
+              />
             )}
 
             {/* Product catalog */}
