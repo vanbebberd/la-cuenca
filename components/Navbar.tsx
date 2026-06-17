@@ -33,7 +33,7 @@ export function Navbar() {
     <header className="sticky top-0 z-50 bg-white/98 backdrop-blur-md border-b border-gray-100 shadow-sm">
       <div className="max-w-7xl mx-auto px-4 h-20 flex items-center justify-between">
         <Link href="/" className="flex items-center shrink-0">
-          <Image src="/logo.png" alt="La Cuenca" width={160} height={40} className="h-9 w-auto object-contain grayscale opacity-80" />
+          <Image src="/logo.png" alt="La Cuenca" width={160} height={40} className="h-12 w-auto object-contain grayscale opacity-80" />
         </Link>
 
         {/* Desktop nav */}
