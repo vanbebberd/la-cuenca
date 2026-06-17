@@ -714,6 +714,14 @@ model ActivityBooking {
   @@index([userId])
 }
 
+// ─── SITE SETTINGS ──────────────────────────────────────────────────────────
+
+model SiteSetting {
+  key       String   @id
+  value     String
+  updatedAt DateTime @updatedAt
+}
+
 // ─── EDITORIAL POSTS ────────────────────────────────────────────────────────
 
 model Post {

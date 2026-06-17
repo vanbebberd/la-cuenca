@@ -38,7 +38,7 @@ const CITY_PHOTOS: Record<string, string> = {
 export default async function HomePage() {
   const lang = await getLang();
 
-  const [featured, cities, upcomingEvents, posts] = await Promise.all([
+  const [featured, cities, upcomingEvents, posts, postsTitleSetting] = await Promise.all([
     prisma.business.findMany({
       where: { featured: true, status: "ACTIVE", plan: "PRO" },
       include: { city: true, category: true },
@@ -57,6 +57,7 @@ export default async function HomePage() {
       orderBy: [{ order: "asc" }, { createdAt: "desc" }],
       take: 3,
     }),
+    prisma.siteSetting.findUnique({ where: { key: "posts_section_title" } }),
   ]);
 
   return (
@@ -343,6 +344,9 @@ export default async function HomePage() {
       {posts.length > 0 && (
         <section className="py-16 bg-white">
           <div className="max-w-6xl mx-auto px-4">
+            <h2 className="text-2xl font-black text-gray-900 mb-8">
+              {postsTitleSetting?.value ?? "Imperdibles de La Cuenca"}
+            </h2>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
               {posts.map((post) => {
                 const inner = (

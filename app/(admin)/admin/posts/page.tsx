@@ -25,10 +25,28 @@ export default function PostsAdminPage() {
   const [form, setForm] = useState(empty);
   const [uploadingNew, setUploadingNew] = useState(false);
   const fileRefNew = useRef<HTMLInputElement>(null);
+  const [sectionTitle, setSectionTitle] = useState("Imperdibles de La Cuenca");
+  const [savingTitle, setSavingTitle] = useState(false);
 
   useEffect(() => {
-    fetch("/api/admin/posts").then(r => r.json()).then(setPosts).finally(() => setLoading(false));
+    Promise.all([
+      fetch("/api/admin/posts").then(r => r.json()),
+      fetch("/api/admin/settings?key=posts_section_title").then(r => r.json()),
+    ]).then(([postsData, settingData]) => {
+      setPosts(postsData);
+      if (settingData.value) setSectionTitle(settingData.value);
+    }).finally(() => setLoading(false));
   }, []);
+
+  async function saveSectionTitle() {
+    setSavingTitle(true);
+    await fetch("/api/admin/settings", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ key: "posts_section_title", value: sectionTitle }),
+    });
+    setSavingTitle(false);
+  }
 
   async function uploadImage(file: File, onUrl: (url: string) => void, setUploading: (v: boolean) => void) {
     setUploading(true);
@@ -87,6 +105,17 @@ export default function PostsAdminPage() {
         <div>
           <h1 className="text-xl font-bold text-gray-900">Destacados editoriales</h1>
           <p className="text-xs text-gray-400 mt-0.5">Las 3 primeras cajas publicadas aparecen en el home</p>
+        </div>
+      </div>
+
+      {/* Section title */}
+      <div className="bg-white rounded-2xl border border-gray-100 p-5 mb-4">
+        <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider block mb-2">Título de la sección (home)</label>
+        <div className="flex gap-2">
+          <Input value={sectionTitle} onChange={e => setSectionTitle(e.target.value)} className="flex-1" />
+          <Button size="sm" variant="outline" onClick={saveSectionTitle} disabled={savingTitle} className="shrink-0">
+            {savingTitle ? "Guardando..." : "Guardar"}
+          </Button>
         </div>
       </div>
 
