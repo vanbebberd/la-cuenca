@@ -112,11 +112,11 @@ export default async function HomePage() {
       <section className="py-16 bg-gray-50">
         <div className="max-w-5xl mx-auto px-4">
           <h2 className="text-2xl font-black text-gray-900 mb-8">{t("by_city", lang)}</h2>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             {cities.map((city) => (
               <Link key={city.slug} href={`/directory?ciudad=${city.slug}`} className="group block">
-                <article className="rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1.5 border border-gray-100/80 bg-white">
-                  <div className="relative h-40 overflow-hidden bg-gray-100">
+                <article className="overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100/80 bg-white">
+                  <div className="relative h-56 overflow-hidden bg-gray-100">
                     <Image
                       src={city.image ?? CITY_PHOTOS[city.slug] ?? "https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=400&q=80"}
                       alt={city.name}

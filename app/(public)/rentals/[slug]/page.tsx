@@ -119,7 +119,17 @@ export default async function RentalDetailPage({ params }: Props) {
           </div>
 
           {/* Sidebar */}
-          <div>
+          <div className="space-y-4">
+            {property.bookingUrl && (
+              <a
+                href={property.bookingUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-center gap-2 w-full bg-orange-500 hover:bg-orange-600 transition-colors text-white font-bold text-sm py-3.5 px-6 rounded-2xl shadow-sm"
+              >
+                Reservar ahora
+              </a>
+            )}
             <BookingWidget
               slug={property.slug}
               pricePerNight={property.pricePerNight}

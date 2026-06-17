@@ -528,6 +528,7 @@ model Property {
 
   amenities          String[]
   coverImage         String?
+  bookingUrl         String?
   photos             PropertyPhoto[]
   bookings           PropertyBooking[]
   blockedDates       PropertyBlockedDate[]

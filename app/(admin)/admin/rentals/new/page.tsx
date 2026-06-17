@@ -16,7 +16,7 @@ export default function NewRentalPage() {
     title: "", shortDesc: "", description: "", citySlug: CITIES[0].slug,
     address: "", pricePerNight: "", cleaningFee: "0", platformFeePercent: "10",
     maxGuests: "2", bedrooms: "1", beds: "1", bathrooms: "1",
-    lat: "", lng: "", status: "ACTIVE", featured: false,
+    lat: "", lng: "", status: "ACTIVE", featured: false, bookingUrl: "",
   });
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) {
@@ -95,6 +95,13 @@ export default function NewRentalPage() {
             <Field label="Tarifa limpieza"><Input name="cleaningFee" type="number" min="0" value={form.cleaningFee} onChange={handleChange} /></Field>
             <Field label="Comisión plataforma %"><Input name="platformFeePercent" type="number" min="0" max="30" step="0.5" value={form.platformFeePercent} onChange={handleChange} /></Field>
           </div>
+        </Section>
+
+        <Section title="Reservas externas">
+          <Field label="Link de reserva (Airbnb, Booking, etc.)">
+            <Input name="bookingUrl" type="url" placeholder="https://airbnb.com/rooms/..." value={form.bookingUrl} onChange={handleChange} />
+          </Field>
+          <p className="text-xs text-gray-400">Si tienes el arriendo en Airbnb u otra plataforma, los visitantes verán un botón "Reservar" que los lleva directo ahí.</p>
         </Section>
 
         <Section title="Ubicación GPS">

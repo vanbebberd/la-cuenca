@@ -367,7 +367,7 @@ export default async function BusinessPage({ params }: Props) {
                     <div className="w-8 h-8 rounded-lg bg-pink-100 flex items-center justify-center shrink-0">
                       <Link2 className="h-3.5 w-3.5 text-pink-600" />
                     </div>
-                    <span>@{business.instagram.replace("@", "")}</span>
+                    <span>Instagram</span>
                   </a>
                 )}
                 {business.website && (

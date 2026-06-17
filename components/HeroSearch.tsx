@@ -80,7 +80,7 @@ export function HeroSearch() {
           <button
             type="submit"
             disabled={loading}
-            className="bg-emerald-600 hover:bg-emerald-700 disabled:opacity-70 text-white px-6 py-3 rounded-xl text-sm font-bold transition-colors flex items-center gap-2 shrink-0"
+            className="bg-orange-500 hover:bg-orange-600 disabled:opacity-70 text-white px-6 py-3 rounded-xl text-sm font-bold transition-colors flex items-center gap-2 shrink-0"
           >
             {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
             <span className="hidden sm:inline">{loading ? "Buscando..." : "Buscar"}</span>
