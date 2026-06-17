@@ -111,4 +111,6 @@ export const AMENITIES = [
   { id: "accesible",      label: "Acceso silla de ruedas", emoji: "♿", group: "Accesibilidad" },
   { id: "vegano",         label: "Opciones veganas",       emoji: "🌱", group: "Comida" },
   { id: "gluten-free",    label: "Sin gluten",             emoji: "🌾", group: "Comida" },
+  { id: "piscina",        label: "Piscina",                emoji: "🏊", group: "Comodidades" },
+  { id: "caminable",      label: "Distancia caminable",    emoji: "🚶", group: "Ambiente" },
 ] as const;
