@@ -713,3 +713,17 @@ model ActivityBooking {
   @@index([sessionId])
   @@index([userId])
 }
+
+// ─── EDITORIAL POSTS ────────────────────────────────────────────────────────
+
+model Post {
+  id          String   @id @default(cuid())
+  title       String
+  excerpt     String?
+  image       String?
+  linkUrl     String?
+  published   Boolean  @default(false)
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}

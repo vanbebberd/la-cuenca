@@ -2,7 +2,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { LayoutDashboard, Store, Ticket, Gift, Users, Settings, BarChart3, MapPin, Tag, CalendarDays, CreditCard, Home, Mountain } from "lucide-react";
+import { LayoutDashboard, Store, Ticket, Gift, Users, Settings, BarChart3, MapPin, Tag, CalendarDays, CreditCard, Home, Mountain, FileText } from "lucide-react";
 
 const ADMIN_NAV = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard, adminOnly: false },
@@ -12,6 +12,7 @@ const ADMIN_NAV = [
   { href: "/admin/reservations", label: "Reservas", icon: CalendarDays, adminOnly: false },
   { href: "/admin/planes", label: "Planes", icon: CreditCard, adminOnly: true },
   { href: "/admin/events", label: "Eventos", icon: Ticket, adminOnly: false },
+  { href: "/admin/posts",  label: "Destacados", icon: FileText, adminOnly: false },
   { href: "/admin/categories", label: "Categorías", icon: Tag, adminOnly: true },
   { href: "/admin/cities", label: "Ciudades", icon: MapPin, adminOnly: true },
   { href: "/admin/points", label: "Puntos", icon: Gift, adminOnly: true },

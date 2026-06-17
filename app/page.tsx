@@ -38,7 +38,7 @@ const CITY_PHOTOS: Record<string, string> = {
 export default async function HomePage() {
   const lang = await getLang();
 
-  const [featured, cities, upcomingEvents] = await Promise.all([
+  const [featured, cities, upcomingEvents, posts] = await Promise.all([
     prisma.business.findMany({
       where: { featured: true, status: "ACTIVE", plan: "PRO" },
       include: { city: true, category: true },
@@ -51,6 +51,11 @@ export default async function HomePage() {
       include: { city: true },
       orderBy: { startDate: "asc" },
       take: 4,
+    }),
+    prisma.post.findMany({
+      where: { published: true },
+      orderBy: [{ order: "asc" }, { createdAt: "desc" }],
+      take: 3,
     }),
   ]);
 
@@ -333,6 +338,45 @@ export default async function HomePage() {
           </Link>
         </div>
       </section>
+
+      {/* ── DESTACADOS EDITORIALES ───────────────────────────────────────── */}
+      {posts.length > 0 && (
+        <section className="py-16 bg-white">
+          <div className="max-w-6xl mx-auto px-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+              {posts.map((post) => {
+                const inner = (
+                  <div className="group h-full flex flex-col bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-lg transition-all duration-300">
+                    <div className="relative h-48 bg-gradient-to-br from-gray-100 to-gray-50 overflow-hidden shrink-0">
+                      {post.image ? (
+                        <Image src={post.image} alt={post.title} fill className="object-cover group-hover:scale-105 transition-transform duration-500" sizes="420px" />
+                      ) : (
+                        <div className="absolute inset-0 flex items-center justify-center text-5xl opacity-20">📝</div>
+                      )}
+                    </div>
+                    <div className="p-5 flex flex-col flex-1">
+                      <h3 className="font-black text-gray-900 text-base leading-snug mb-2">{post.title}</h3>
+                      {post.excerpt && <p className="text-sm text-gray-500 leading-relaxed flex-1">{post.excerpt}</p>}
+                      {post.linkUrl && (
+                        <span className="mt-4 inline-flex items-center gap-1 text-xs font-semibold text-emerald-600 group-hover:text-emerald-700">
+                          Ver más <ArrowRight className="h-3.5 w-3.5" />
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                );
+                return post.linkUrl ? (
+                  <a key={post.id} href={post.linkUrl} target={post.linkUrl.startsWith("http") ? "_blank" : undefined} rel="noopener noreferrer" className="block h-full">
+                    {inner}
+                  </a>
+                ) : (
+                  <div key={post.id} className="h-full">{inner}</div>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+      )}
 
     </div>
   );
