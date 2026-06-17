@@ -40,7 +40,7 @@ export default function EditBusinessPage() {
   const [form, setForm] = useState({
     name: "", shortDesc: "", description: "", citySlug: "", categorySlug: "",
     priceRange: "", address: "", phone: "", whatsapp: "", email: "",
-    website: "", instagram: "", facebook: "", menuUrl: "",
+    website: "", instagram: "", facebook: "", menuUrl: "", bookingUrl: "",
     lat: "", lng: "", pointsEnabled: false, pointsPerPeso: "0.01",
     coverImage: "", status: "ACTIVE", featured: false, plan: "FREE",
   });
@@ -70,6 +70,7 @@ export default function EditBusinessPage() {
         instagram: business.instagram ?? "",
         facebook: business.facebook ?? "",
         menuUrl: business.menuUrl ?? "",
+        bookingUrl: business.bookingUrl ?? "",
         lat: business.lat?.toString() ?? "",
         lng: business.lng?.toString() ?? "",
         pointsEnabled: business.pointsEnabled ?? false,
@@ -334,6 +335,7 @@ export default function EditBusinessPage() {
             {field("Facebook", "facebook")}
           </div>
           {field("URL Carta/Menú", "menuUrl", "url")}
+          {field("Link de reservas (Booking, hotel propio, etc.)", "bookingUrl", "url")}
         </div>
 
         {/* Location */}

@@ -171,6 +171,7 @@ model Business {
   website     String?
   instagram   String?
   facebook    String?
+  bookingUrl  String?
 
   coverImage  String?
   logo        String?

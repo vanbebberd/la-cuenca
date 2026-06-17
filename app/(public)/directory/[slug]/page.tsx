@@ -148,7 +148,14 @@ export default async function BusinessPage({ params }: Props) {
               </div>
             </div>
             {/* Quick contact buttons */}
-            <div className="flex gap-2 shrink-0">
+            <div className="flex gap-2 shrink-0 flex-wrap">
+              {business.bookingUrl && (
+                <a href={business.bookingUrl} target="_blank" rel="noopener noreferrer">
+                  <Button size="sm" className="gap-1.5 bg-orange-500 hover:bg-orange-600 text-white">
+                    Reservar
+                  </Button>
+                </a>
+              )}
               {business.phone && (
                 <TrackedLink href={`tel:${business.phone}`} businessId={business.id} event="CALL_CLICK">
                   <Button variant="outline" size="sm" className="gap-1.5">

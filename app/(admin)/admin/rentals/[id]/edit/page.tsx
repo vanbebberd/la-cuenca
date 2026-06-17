@@ -21,7 +21,7 @@ export default function EditRentalPage() {
     title: "", shortDesc: "", description: "", citySlug: "",
     address: "", pricePerNight: "", cleaningFee: "", platformFeePercent: "",
     maxGuests: "", bedrooms: "", beds: "", bathrooms: "",
-    lat: "", lng: "", status: "ACTIVE", featured: false, coverImage: "", bookingUrl: "",
+    lat: "", lng: "", status: "ACTIVE", featured: false, coverImage: "",
   });
 
   useEffect(() => {
@@ -35,7 +35,6 @@ export default function EditRentalPage() {
         beds: p.beds?.toString() ?? "1", bathrooms: p.bathrooms?.toString() ?? "1",
         lat: p.lat?.toString() ?? "", lng: p.lng?.toString() ?? "",
         status: p.status ?? "ACTIVE", featured: p.featured ?? false, coverImage: p.coverImage ?? "",
-        bookingUrl: p.bookingUrl ?? "",
       });
       setAmenities(p.amenities ?? []);
     }).finally(() => setLoading(false));
@@ -142,15 +141,6 @@ export default function EditRentalPage() {
               <div key={n}><label className="block text-xs font-medium text-gray-600 mb-1">{l}</label><Input name={n} type="number" min="0" value={form[n as keyof typeof form] as string} onChange={handleChange} /></div>
             ))}
           </div>
-        </div>
-
-        <div className="space-y-4 border-t border-gray-100 pt-4">
-          <h2 className="text-sm font-semibold text-gray-700 uppercase tracking-wider">Reservas externas</h2>
-          <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1">Link de reserva (Airbnb, Booking, etc.)</label>
-            <Input name="bookingUrl" type="url" placeholder="https://airbnb.com/rooms/..." value={form.bookingUrl} onChange={handleChange} />
-          </div>
-          <p className="text-xs text-gray-400">Los visitantes verán un botón "Reservar" que los lleva directo a esta URL.</p>
         </div>
 
         <div className="space-y-4 border-t border-gray-100 pt-4">
