@@ -22,6 +22,10 @@ const ICON_MAP: Record<string, LucideIcon> = {
   Activity, ShoppingBag, Bike, GlassWater, Heart, Wrench, Camera, Compass,
 };
 
+// ── Cambia esta URL para actualizar el banner del hero ───────────────────────
+// Puede ser una URL de Unsplash, Cloudinary, o una imagen local en /public (ej: "/hero.jpg")
+const HERO_IMAGE = "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=1920&q=90";
+
 const CITY_PHOTOS: Record<string, string> = {
   "puerto-montt": "https://images.unsplash.com/photo-1553761984-30e1bfcb8bdb?w=600&q=80",
   "puerto-varas": "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&q=80",
@@ -50,7 +54,7 @@ export default async function HomePage() {
       {/* ── HERO ─────────────────────────────────────────────────────────── */}
       <section className="relative h-[92vh] min-h-[620px] flex flex-col items-center justify-center overflow-hidden">
         <Image
-          src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=1920&q=90"
+          src={HERO_IMAGE}
           alt="La Cuenca"
           fill
           className="object-cover object-center"
