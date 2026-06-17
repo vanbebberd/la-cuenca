@@ -6,7 +6,7 @@ import {
   MapPin, Ticket, Gift, Star, Sparkles,
   Coffee, UtensilsCrossed, BedDouble, Beer, Map,
   Activity, ShoppingBag, Bike, GlassWater, Heart, Wrench, Camera, Compass,
-  ArrowRight, CheckCircle2,
+  ArrowRight, CheckCircle2, Calendar,
 } from "lucide-react";
 import { type LucideIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -38,7 +38,7 @@ const CITY_PHOTOS: Record<string, string> = {
 export default async function HomePage() {
   const lang = await getLang();
 
-  const [featured, cities] = await Promise.all([
+  const [featured, cities, upcomingEvents] = await Promise.all([
     prisma.business.findMany({
       where: { featured: true, status: "ACTIVE", plan: "PRO" },
       include: { city: true, category: true },
@@ -46,6 +46,12 @@ export default async function HomePage() {
       take: 8,
     }),
     prisma.city.findMany({ orderBy: { name: "asc" } }),
+    prisma.event.findMany({
+      where: { published: true, startDate: { gte: new Date() } },
+      include: { city: true },
+      orderBy: { startDate: "asc" },
+      take: 4,
+    }),
   ]);
 
   return (
@@ -155,6 +161,57 @@ export default async function HomePage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
               {featured.map((b) => (
                 <BusinessCard key={b.id} business={b} />
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* ── EVENTOS ──────────────────────────────────────────────────────── */}
+      {upcomingEvents.length > 0 && (
+        <section className="py-16 bg-gray-50">
+          <div className="max-w-6xl mx-auto px-4">
+            <div className="flex items-center justify-between mb-8">
+              <div>
+                <p className="text-orange-500 text-xs font-bold uppercase tracking-widest mb-1">Próximos eventos</p>
+                <h2 className="text-2xl font-black text-gray-900">¿Qué hay esta semana?</h2>
+              </div>
+              <Link href="/events" className="hidden sm:flex items-center gap-1 text-sm font-medium text-gray-400 hover:text-gray-800 transition-colors">
+                Ver todos <ArrowRight className="h-3.5 w-3.5" />
+              </Link>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+              {upcomingEvents.map((ev) => (
+                <Link key={ev.id} href={`/events/${ev.slug}`} className="group block bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-lg transition-all duration-300">
+                  <div className="relative h-44 bg-gradient-to-br from-orange-100 to-amber-50 overflow-hidden">
+                    {ev.image ? (
+                      <Image src={ev.image} alt={ev.title} fill className="object-cover group-hover:scale-105 transition-transform duration-300" sizes="320px" />
+                    ) : (
+                      <div className="absolute inset-0 flex items-center justify-center text-5xl opacity-30">🎭</div>
+                    )}
+                    <span className="absolute top-3 left-3 text-[10px] font-bold uppercase tracking-wider bg-orange-500 text-white px-2 py-1 rounded-full">
+                      Evento
+                    </span>
+                    {ev.isFree && (
+                      <span className="absolute top-3 right-3 text-[10px] font-bold uppercase tracking-wider bg-emerald-500 text-white px-2 py-1 rounded-full">
+                        Gratis
+                      </span>
+                    )}
+                  </div>
+                  <div className="p-4">
+                    <p className="font-bold text-gray-900 text-sm leading-tight line-clamp-2 mb-2">{ev.title}</p>
+                    <div className="flex items-center gap-1.5 text-xs text-gray-400">
+                      <Calendar className="h-3 w-3 shrink-0" />
+                      <span>{new Date(ev.startDate).toLocaleDateString("es-CL", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}</span>
+                    </div>
+                    {ev.location && (
+                      <div className="flex items-center gap-1.5 text-xs text-gray-400 mt-1">
+                        <MapPin className="h-3 w-3 shrink-0" />
+                        <span className="truncate">{ev.location}</span>
+                      </div>
+                    )}
+                  </div>
+                </Link>
               ))}
             </div>
           </div>

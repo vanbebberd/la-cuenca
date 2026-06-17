@@ -1,9 +1,10 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ArrowLeft, Plus, Trash2 } from "lucide-react";
+import { ArrowLeft, Plus, Trash2, Upload, X } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 
 interface TicketType { id: string; name: string; description?: string | null; price: number; capacity: number; sold: number; }
@@ -19,6 +20,8 @@ export default function EditEventPage() {
   const [loading, setLoading] = useState(!isNew);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const fileRef = useRef<HTMLInputElement>(null);
   const [ticketTypes, setTicketTypes] = useState<TicketType[]>([]);
   const [newTicket, setNewTicket] = useState({ name: "", description: "", price: "", capacity: "" });
   const [addingTicket, setAddingTicket] = useState(false);
@@ -52,6 +55,16 @@ export default function EditEventPage() {
       });
     }
   }, [id, isNew]);
+
+  async function handleImageUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadingImage(true);
+    const fd = new FormData(); fd.append("file", file);
+    const res = await fetch("/api/admin/upload", { method: "POST", body: fd });
+    if (res.ok) { const { url } = await res.json(); setForm(p => ({ ...p, image: url })); }
+    setUploadingImage(false);
+  }
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) {
     const { name, value, type } = e.target;
@@ -169,8 +182,20 @@ export default function EditEventPage() {
           </div>
         </div>
         <div>
-          <label className="text-xs text-gray-500 mb-1 block">URL imagen</label>
-          <Input name="image" type="url" value={form.image} onChange={handleChange} placeholder="https://..." />
+          <label className="text-xs text-gray-500 mb-1 block">Imagen del evento</label>
+          {form.image ? (
+            <div className="relative h-40 rounded-xl overflow-hidden bg-gray-100 mb-2">
+              <Image src={form.image} alt="Evento" fill className="object-cover" />
+              <button type="button" onClick={() => setForm(p => ({ ...p, image: "" }))} className="absolute top-2 right-2 bg-black/60 text-white rounded-full p-1 hover:bg-black/80"><X className="h-3.5 w-3.5" /></button>
+            </div>
+          ) : null}
+          <div className="flex gap-2">
+            <Input name="image" type="url" value={form.image} onChange={handleChange} placeholder="https://... o sube una foto" className="flex-1" />
+            <Button type="button" variant="outline" size="sm" onClick={() => fileRef.current?.click()} disabled={uploadingImage} className="shrink-0 gap-1.5">
+              <Upload className="h-3.5 w-3.5" />{uploadingImage ? "Subiendo..." : "Subir"}
+            </Button>
+          </div>
+          <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleImageUpload} />
         </div>
 
         {/* Free / Paid toggle */}
