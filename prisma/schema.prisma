@@ -106,6 +106,7 @@ model User {
   accounts         Account[]
   sessions         Session[]
   reviews          Review[]
+  propertyReviews  PropertyReview[]
   reservations     Reservation[]
   tickets          Ticket[]
   pointsBalance    PointsBalance?
@@ -530,9 +531,12 @@ model Property {
   amenities          String[]
   coverImage         String?
   bookingUrl         String?
+  avgRating          Float          @default(0)
+  reviewCount        Int            @default(0)
   photos             PropertyPhoto[]
   bookings           PropertyBooking[]
   blockedDates       PropertyBlockedDate[]
+  propertyReviews    PropertyReview[]
 
   createdAt          DateTime       @default(now())
   updatedAt          DateTime       @updatedAt
@@ -592,6 +596,21 @@ model PropertyBlockedDate {
   reason     String?
 
   @@unique([propertyId, date])
+  @@index([propertyId])
+}
+
+model PropertyReview {
+  id         String   @id @default(cuid())
+  propertyId String
+  property   Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  rating     Int
+  comment    String?  @db.Text
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@unique([propertyId, userId])
   @@index([propertyId])
 }
 

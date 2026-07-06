@@ -7,6 +7,8 @@ import { RENTAL_AMENITIES } from "@/lib/constants";
 import { formatPrice } from "@/lib/utils";
 import type { Metadata } from "next";
 import { BookingWidget } from "./BookingWidget";
+import { PropertyReviewSection } from "./PropertyReviewSection";
+import { StarRating } from "@/components/StarRating";
 
 interface Props { params: Promise<{ slug: string }>; }
 
@@ -21,7 +23,15 @@ export default async function RentalDetailPage({ params }: Props) {
   const { slug } = await params;
   const property = await prisma.property.findUnique({
     where: { slug, status: "ACTIVE" },
-    include: { city: true, photos: { orderBy: { order: "asc" } } },
+    include: {
+      city: true,
+      photos: { orderBy: { order: "asc" } },
+      propertyReviews: {
+        include: { user: { select: { name: true, image: true } } },
+        orderBy: { createdAt: "desc" },
+        take: 20,
+      },
+    },
   });
   if (!property) notFound();
 
@@ -64,6 +74,9 @@ export default async function RentalDetailPage({ params }: Props) {
             <span className="flex items-center gap-1"><BedDouble className="h-3.5 w-3.5" />{property.bedrooms} dormitorio{property.bedrooms > 1 ? "s" : ""}</span>
             <span className="flex items-center gap-1"><Bed className="h-3.5 w-3.5" />{property.beds} cama{property.beds > 1 ? "s" : ""}</span>
             <span className="flex items-center gap-1"><Bath className="h-3.5 w-3.5" />{property.bathrooms} baño{property.bathrooms > 1 ? "s" : ""}</span>
+            {property.reviewCount > 0 && (
+              <StarRating rating={property.avgRating} size="sm" showValue count={property.reviewCount} />
+            )}
           </div>
         </div>
 
@@ -116,6 +129,13 @@ export default async function RentalDetailPage({ params }: Props) {
                 <div className="flex justify-between"><span>Tarifa de servicio ({property.platformFeePercent}%)</span><span>Se calcula al reservar</span></div>
               </div>
             </section>
+
+            <PropertyReviewSection
+              propertyId={property.id}
+              reviews={property.propertyReviews}
+              avgRating={property.avgRating}
+              reviewCount={property.reviewCount}
+            />
           </div>
 
           {/* Sidebar */}
