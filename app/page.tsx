@@ -11,7 +11,7 @@ import {
 import { type LucideIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CATEGORIES } from "@/lib/constants";
-import { HeroSearch } from "@/components/HeroSearch";
+import { LakiHero } from "@/components/LakiHero";
 import { prisma } from "@/lib/prisma";
 import { BusinessCard } from "@/components/BusinessCard";
 import { t } from "@/lib/i18n";
@@ -88,7 +88,7 @@ export default async function HomePage() {
             {t("hero_desc", lang)}
           </p>
 
-          <HeroSearch />
+          <LakiHero />
         </div>
       </section>
 

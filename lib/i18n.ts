@@ -12,10 +12,10 @@ const T = {
     nav_close_session: "Cerrar sesión",
     // Homepage
     hero_sub: "Puerto Varas · Puerto Montt · Frutillar",
-    hero_title1: "Descubre, vive",
-    hero_title2: "y disfruta",
+    hero_title1: "Tu panorama",
+    hero_title2: "perfecto en",
     hero_title3: "la cuenca",
-    hero_desc: "Restaurantes, cafeterías, actividades y eventos — todo lo que necesitas, en un solo lugar.",
+    hero_desc: "Dile a Laki con quién vas y arma tu itinerario con lugares reales de la zona.",
     hero_explore: "Explorar",
     by_category: "Explorar por categoría",
     see_all: "Ver todo",

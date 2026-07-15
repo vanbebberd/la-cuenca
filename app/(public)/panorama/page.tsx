@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { Sparkles, MapPin, Clock, ChevronRight, RotateCcw, Share2, ExternalLink, Cloud, Sun, CloudRain } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
@@ -47,8 +48,9 @@ interface Panorama {
 }
 
 export default function PanoramaPage() {
+  const searchParams = useSearchParams();
   const [ciudad, setCiudad] = useState("");
-  const [tipo, setTipo] = useState("");
+  const [tipo, setTipo] = useState(searchParams.get("tipo") ?? "");
   const [presupuesto, setPresupuesto] = useState("");
   const [duracion, setDuracion] = useState("");
   const [clima, setClima] = useState("");
