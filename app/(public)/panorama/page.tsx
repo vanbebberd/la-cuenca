@@ -23,12 +23,6 @@ const DURACIONES = [
   { value: "dia_completo", label: "☀️ Día completo" },
 ];
 
-const DIAS_OPCIONES = [
-  { value: "1", label: "1 día" },
-  { value: "2", label: "2 días" },
-  { value: "3", label: "3 días" },
-  { value: "4+", label: "4+ días" },
-];
 const CLIMAS = [
   { value: "soleado", label: "☀️ Soleado", icon: Sun },
   { value: "parcial", label: "⛅ Parcialmente nublado", icon: Cloud },
@@ -58,7 +52,6 @@ export default function PanoramaPage() {
   const searchParams = useSearchParams();
   const [ciudades, setCiudades] = useState<string[]>([]);
   const [tipo, setTipo] = useState(searchParams.get("tipo") ?? "");
-  const [dias, setDias] = useState(searchParams.get("dias") ?? "");
   const [presupuesto, setPresupuesto] = useState("");
   const [duracion, setDuracion] = useState("");
   const [clima, setClima] = useState("");
@@ -87,7 +80,7 @@ export default function PanoramaPage() {
       const res = await fetch("/api/panorama", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ciudades, tipo, presupuesto, duracion, dias, clima, intereses }),
+        body: JSON.stringify({ ciudades, tipo, presupuesto, duracion, clima, intereses }),
       });
       let data: { error?: string } & Panorama | null = null;
       try { data = await res.json(); } catch { /* non-json response */ }
@@ -217,26 +210,6 @@ export default function PanoramaPage() {
                     onClick={() => setDuracion(d.value)}
                     className={`px-4 py-2 rounded-xl border text-sm font-medium transition-all ${
                       duracion === d.value
-                        ? "bg-gray-900 text-white border-gray-900"
-                        : "bg-white border-gray-200 text-gray-700 hover:border-gray-400"
-                    }`}
-                  >
-                    {d.label}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Días */}
-            <div>
-              <p className="text-sm font-semibold text-gray-700 mb-3">¿Cuántos días?</p>
-              <div className="flex flex-wrap gap-2">
-                {DIAS_OPCIONES.map((d) => (
-                  <button
-                    key={d.value}
-                    onClick={() => setDias(prev => prev === d.value ? "" : d.value)}
-                    className={`px-4 py-2 rounded-xl border text-sm font-medium transition-all ${
-                      dias === d.value
                         ? "bg-gray-900 text-white border-gray-900"
                         : "bg-white border-gray-200 text-gray-700 hover:border-gray-400"
                     }`}

@@ -10,22 +10,13 @@ const TIPOS = [
   { value: "solo",    label: "🧭 Solo" },
 ];
 
-const DIAS = [
-  { value: "1", label: "1 día" },
-  { value: "2", label: "2 días" },
-  { value: "3", label: "3 días" },
-  { value: "4+", label: "4+ días" },
-];
-
 export function LakiHero() {
   const [tipo, setTipo] = useState("");
-  const [dias, setDias] = useState("");
   const router = useRouter();
 
   function handleGo() {
     const p = new URLSearchParams();
     if (tipo) p.set("tipo", tipo);
-    if (dias) p.set("dias", dias);
     router.push(`/panorama${p.toString() ? `?${p}` : ""}`);
   }
 
@@ -54,23 +45,6 @@ export function LakiHero() {
             >
               <span className="text-lg">{t.label.split(" ")[0]}</span>
               <span>{t.label.split(" ").slice(1).join(" ")}</span>
-            </button>
-          ))}
-        </div>
-
-        <p className="text-white font-semibold text-xs mb-2">¿Cuántos días?</p>
-        <div className="grid grid-cols-4 gap-1.5 mb-4">
-          {DIAS.map((d) => (
-            <button
-              key={d.value}
-              onClick={() => setDias(prev => prev === d.value ? "" : d.value)}
-              className={`py-2 rounded-xl border text-xs font-medium transition-all ${
-                dias === d.value
-                  ? "bg-amber-400 text-gray-900 border-amber-400"
-                  : "bg-white/10 text-white/80 border-white/20 hover:bg-white/20 hover:text-white"
-              }`}
-            >
-              {d.label}
             </button>
           ))}
         </div>

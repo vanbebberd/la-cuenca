@@ -10,7 +10,6 @@ const schema = z.object({
   tipo: z.string(),
   presupuesto: z.string(),
   duracion: z.string(),
-  dias: z.string().optional(),
   clima: z.string().optional(),
   intereses: z.array(z.string()),
 });
@@ -21,7 +20,7 @@ export async function POST(req: NextRequest) {
   const parsed = schema.safeParse(body);
   if (!parsed.success) return NextResponse.json({ error: "Datos inválidos" }, { status: 400 });
 
-  const { ciudades, tipo, presupuesto, duracion, dias, clima, intereses } = parsed.data;
+  const { ciudades, tipo, presupuesto, duracion, clima, intereses } = parsed.data;
 
   const businesses = await prisma.business.findMany({
     where: {
@@ -80,7 +79,6 @@ Usa SOLO los locales de la lista. Si no hay suficientes, menciona actividades ge
 - Tipo de grupo: ${tipo}
 - Presupuesto: ${presupuesto}
 - Duración del día: ${duracion === "mañana" ? "solo la mañana (9:00-13:00)" : duracion === "tarde" ? "solo la tarde (14:00-20:00)" : "día completo (9:00-21:00)"}
-- Número de días: ${dias === "4+" ? "4 o más días" : dias ? `${dias} día${dias === "1" ? "" : "s"}` : "1 día"}${Number(dias) > 1 || dias === "4+" ? " — organiza el itinerario por días (Día 1, Día 2, etc.) usando el campo hora como 'Día 1 - 09:00'" : ""}
 - Clima del día: ${clima === "soleado" ? "☀️ Soleado — aprovecha actividades al aire libre" : clima === "lluvioso" ? "🌧️ Lluvioso — prioriza actividades bajo techo, cafeterías, museos, restaurantes" : clima === "parcial" ? "⛅ Parcialmente nublado — mezcla de actividades" : "no especificado"}
 - Intereses: ${intereses.join(", ") || "variado"}
 
