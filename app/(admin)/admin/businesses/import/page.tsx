@@ -13,7 +13,7 @@ const REQUIRED = ["nombre","categoria","ciudad"];
 const CSV_TEMPLATE = COLUMNS.join(",") + "\n" +
   "Café del Volcán,cafeterias,puerto-varas,+56912345678,,hola@cafe.cl,https://cafe.cl,@cafedelvolcan,,,El mejor café con vista al lago,Café en Puerto Varas,Av. Principal 123";
 
-function parseCSVLine(line: string): string[] {
+function parseCSVLine(line: string, sep: string): string[] {
   const result: string[] = [];
   let current = "";
   let inQuotes = false;
@@ -22,7 +22,7 @@ function parseCSVLine(line: string): string[] {
     if (ch === '"') {
       if (inQuotes && line[i + 1] === '"') { current += '"'; i++; }
       else { inQuotes = !inQuotes; }
-    } else if (ch === "," && !inQuotes) {
+    } else if (ch === sep && !inQuotes) {
       result.push(current.trim()); current = "";
     } else {
       current += ch;
@@ -32,17 +32,26 @@ function parseCSVLine(line: string): string[] {
   return result;
 }
 
+function detectSeparator(firstLine: string): string {
+  const commas = (firstLine.match(/,/g) ?? []).length;
+  const semis  = (firstLine.match(/;/g) ?? []).length;
+  return semis > commas ? ";" : ",";
+}
+
 function parseCSV(text: string): Row[] {
-  // Normalize line endings
   const lines = text.replace(/\r\n/g, "\n").replace(/\r/g, "\n").trim().split("\n");
   if (lines.length < 2) return [];
-  const headers = parseCSVLine(lines[0]).map(h => h.toLowerCase().replace(/\s+/g, "_"));
-  return lines.slice(1).filter(l => l.trim()).map(line => {
-    const vals = parseCSVLine(line);
-    const row: Row = {};
-    headers.forEach((h, i) => { row[h] = vals[i] ?? ""; });
-    return row;
-  });
+  const sep = detectSeparator(lines[0]);
+  const headers = parseCSVLine(lines[0], sep).map(h => h.toLowerCase().replace(/\s+/g, "_"));
+  return lines
+    .slice(1)
+    .map(line => {
+      const vals = parseCSVLine(line, sep);
+      const row: Row = {};
+      headers.forEach((h, i) => { row[h] = vals[i] ?? ""; });
+      return row;
+    })
+    .filter(row => row["nombre"]?.trim()); // skip rows with no name (empty rows)
 }
 
 function downloadTemplate() {
