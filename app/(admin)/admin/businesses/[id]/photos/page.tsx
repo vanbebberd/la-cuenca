@@ -38,11 +38,11 @@ export default function BusinessPhotosPage() {
       const fd = new FormData();
       fd.append("file", file);
       const uploadRes = await fetch("/api/admin/upload", { method: "POST", body: fd });
-      if (!uploadRes.ok) throw new Error("Error subiendo imagen");
-      const { url } = await uploadRes.json();
-      await addPhoto(url, file.name.replace(/\.[^/.]+$/, ""));
-    } catch {
-      setMsg("Error subiendo la imagen.");
+      const data = await uploadRes.json();
+      if (!uploadRes.ok) throw new Error(data.error ?? `Error ${uploadRes.status}`);
+      await addPhoto(data.url, file.name.replace(/\.[^/.]+$/, ""));
+    } catch (err) {
+      setMsg(`Error: ${err instanceof Error ? err.message : String(err)}`);
     } finally {
       setUploading(false);
       if (fileInputRef.current) fileInputRef.current.value = "";
@@ -139,7 +139,7 @@ export default function BusinessPhotosPage() {
           </div>
         </form>
 
-        {msg && <p className="text-sm text-emerald-600">{msg}</p>}
+        {msg && <p className={`text-sm ${msg.startsWith("Error") ? "text-red-500" : "text-emerald-600"}`}>{msg}</p>}
       </div>
 
       {/* Photo grid */}
