@@ -64,7 +64,7 @@ export default async function HomePage() {
     <div className="min-h-screen bg-white">
 
       {/* ── HERO ─────────────────────────────────────────────────────────── */}
-      <section className="relative h-[92vh] min-h-[620px] flex flex-col items-center justify-center overflow-hidden">
+      <section className="relative min-h-[92vh] flex flex-col items-center justify-center overflow-hidden py-16">
         <Image
           src={HERO_IMAGE}
           alt="La Cuenca"

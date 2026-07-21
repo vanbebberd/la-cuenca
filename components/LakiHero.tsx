@@ -32,39 +32,39 @@ export function LakiHero() {
   return (
     <div className="w-full max-w-xl mx-auto">
       {/* Card */}
-      <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-3xl px-6 py-7 shadow-2xl">
-        <div className="flex items-center gap-2 mb-5">
-          <div className="w-8 h-8 rounded-xl bg-amber-400/20 flex items-center justify-center">
-            <Sparkles className="h-4 w-4 text-amber-400" />
+      <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-3xl px-5 py-5 shadow-2xl">
+        <div className="flex items-center gap-2 mb-4">
+          <div className="w-7 h-7 rounded-xl bg-amber-400/20 flex items-center justify-center">
+            <Sparkles className="h-3.5 w-3.5 text-amber-400" />
           </div>
           <span className="text-xs font-bold text-amber-400 uppercase tracking-widest">Laki — Tu asistente local</span>
         </div>
 
-        <p className="text-white font-semibold text-sm mb-3">¿Con quién vas?</p>
-        <div className="grid grid-cols-4 gap-2 mb-5">
+        <p className="text-white font-semibold text-xs mb-2">¿Con quién vas?</p>
+        <div className="grid grid-cols-4 gap-1.5 mb-4">
           {TIPOS.map((t) => (
             <button
               key={t.value}
               onClick={() => setTipo(prev => prev === t.value ? "" : t.value)}
-              className={`flex flex-col items-center gap-1.5 px-2 py-3 rounded-2xl border text-xs font-medium transition-all ${
+              className={`flex flex-col items-center gap-1 px-1 py-2 rounded-xl border text-xs font-medium transition-all ${
                 tipo === t.value
                   ? "bg-amber-400 text-gray-900 border-amber-400"
                   : "bg-white/10 text-white/80 border-white/20 hover:bg-white/20 hover:text-white"
               }`}
             >
-              <span className="text-xl">{t.label.split(" ")[0]}</span>
+              <span className="text-lg">{t.label.split(" ")[0]}</span>
               <span>{t.label.split(" ").slice(1).join(" ")}</span>
             </button>
           ))}
         </div>
 
-        <p className="text-white font-semibold text-sm mb-3">¿Cuántos días?</p>
-        <div className="grid grid-cols-4 gap-2 mb-5">
+        <p className="text-white font-semibold text-xs mb-2">¿Cuántos días?</p>
+        <div className="grid grid-cols-4 gap-1.5 mb-4">
           {DIAS.map((d) => (
             <button
               key={d.value}
               onClick={() => setDias(prev => prev === d.value ? "" : d.value)}
-              className={`py-2.5 rounded-2xl border text-xs font-medium transition-all ${
+              className={`py-2 rounded-xl border text-xs font-medium transition-all ${
                 dias === d.value
                   ? "bg-amber-400 text-gray-900 border-amber-400"
                   : "bg-white/10 text-white/80 border-white/20 hover:bg-white/20 hover:text-white"
