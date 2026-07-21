@@ -13,45 +13,43 @@ const REQUIRED = ["nombre","categoria","ciudad"];
 const CSV_TEMPLATE = COLUMNS.join(",") + "\n" +
   "Café del Volcán,cafeterias,puerto-varas,+56912345678,,hola@cafe.cl,https://cafe.cl,@cafedelvolcan,,,El mejor café con vista al lago,Café en Puerto Varas,Av. Principal 123";
 
-function parseCSVLine(line: string, sep: string): string[] {
-  const result: string[] = [];
-  let current = "";
+function parseCSV(text: string): Row[] {
+  const normalized = text.replace(/\r\n/g, "\n").replace(/\r/g, "\n").trimEnd();
+  if (!normalized) return [];
+
+  // Detect separator from first line
+  const firstLine = normalized.slice(0, normalized.indexOf("\n") + 1 || undefined);
+  const sep = (firstLine.match(/;/g)?.length ?? 0) > (firstLine.match(/,/g)?.length ?? 0) ? ";" : ",";
+
+  // Full character-by-character parse — handles multiline quoted fields
+  const rows: string[][] = [];
+  let currentRow: string[] = [];
+  let currentField = "";
   let inQuotes = false;
-  for (let i = 0; i < line.length; i++) {
-    const ch = line[i];
+
+  for (let i = 0; i <= normalized.length; i++) {
+    const ch = i < normalized.length ? normalized[i] : "\n"; // virtual newline at end
     if (ch === '"') {
-      if (inQuotes && line[i + 1] === '"') { current += '"'; i++; }
+      if (inQuotes && normalized[i + 1] === '"') { currentField += '"'; i++; }
       else { inQuotes = !inQuotes; }
     } else if (ch === sep && !inQuotes) {
-      result.push(current.trim()); current = "";
+      currentRow.push(currentField.trim()); currentField = "";
+    } else if (ch === "\n" && !inQuotes) {
+      currentRow.push(currentField.trim());
+      if (currentRow.some(v => v)) rows.push(currentRow);
+      currentRow = []; currentField = "";
     } else {
-      current += ch;
+      currentField += ch;
     }
   }
-  result.push(current.trim());
-  return result;
-}
 
-function detectSeparator(firstLine: string): string {
-  const commas = (firstLine.match(/,/g) ?? []).length;
-  const semis  = (firstLine.match(/;/g) ?? []).length;
-  return semis > commas ? ";" : ",";
-}
-
-function parseCSV(text: string): Row[] {
-  const lines = text.replace(/\r\n/g, "\n").replace(/\r/g, "\n").trim().split("\n");
-  if (lines.length < 2) return [];
-  const sep = detectSeparator(lines[0]);
-  const headers = parseCSVLine(lines[0], sep).map(h => h.toLowerCase().replace(/\s+/g, "_"));
-  return lines
-    .slice(1)
-    .map(line => {
-      const vals = parseCSVLine(line, sep);
-      const row: Row = {};
-      headers.forEach((h, i) => { row[h] = vals[i] ?? ""; });
-      return row;
-    })
-    .filter(row => row["nombre"]?.trim()); // skip rows with no name (empty rows)
+  if (rows.length < 2) return [];
+  const headers = rows[0].map(h => h.toLowerCase().replace(/\s+/g, "_"));
+  return rows.slice(1).map(vals => {
+    const row: Row = {};
+    headers.forEach((h, i) => { row[h] = vals[i] ?? ""; });
+    return row;
+  }).filter(row => row["nombre"]?.trim());
 }
 
 function downloadTemplate() {

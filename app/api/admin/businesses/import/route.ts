@@ -29,12 +29,22 @@ export async function POST(req: NextRequest) {
     if (!name) { errors.push({ row: i + 1, name: "-", error: "Nombre vacío" }); continue; }
 
     const catInput = r.categoria?.trim().toLowerCase();
-    const category = categories.find(c => c.slug === catInput || c.name.toLowerCase() === catInput);
-    if (!category) { errors.push({ row: i + 1, name, error: `Categoría no encontrada: "${r.categoria}"` }); continue; }
+    const category = categories.find(c =>
+      c.slug === catInput ||
+      c.name.toLowerCase() === catInput ||
+      c.slug.startsWith(catInput) ||
+      catInput.startsWith(c.slug)
+    );
+    if (!category) { errors.push({ row: i + 1, name, error: `Categoría no encontrada: "${r.categoria}". Disponibles: ${categories.map(c => c.slug).join(", ")}` }); continue; }
 
     const cityInput = r.ciudad?.trim().toLowerCase();
-    const city = cities.find(c => c.slug === cityInput || c.name.toLowerCase() === cityInput);
-    if (!city) { errors.push({ row: i + 1, name, error: `Ciudad no encontrada: "${r.ciudad}"` }); continue; }
+    const city = cities.find(c =>
+      c.slug === cityInput ||
+      c.name.toLowerCase() === cityInput ||
+      c.slug.includes(cityInput) ||
+      cityInput.includes(c.slug)
+    );
+    if (!city) { errors.push({ row: i + 1, name, error: `Ciudad no encontrada: "${r.ciudad}". Disponibles: ${cities.map(c => c.slug).join(", ")}` }); continue; }
 
     // Generate unique slug
     let slug = slugify(name);
