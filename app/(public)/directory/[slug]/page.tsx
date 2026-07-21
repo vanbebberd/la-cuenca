@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import {
-  MapPin, Phone, Globe, Link2, MessageCircle, Clock,
+  MapPin, Phone, Globe, Link2, MessageCircle, Clock, Mail,
   ExternalLink, Navigation, ChevronRight, CheckCircle2, Tag, ShoppingBag,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -161,6 +161,14 @@ export default async function BusinessPage({ params }: Props) {
                   <Button variant="outline" size="sm" className="gap-1.5">
                     <Phone className="h-3.5 w-3.5" />
                     {t("bus_call", lang)}
+                  </Button>
+                </TrackedLink>
+              )}
+              {business.email && (
+                <TrackedLink href={`mailto:${business.email}`} businessId={business.id} event="EMAIL_CLICK">
+                  <Button variant="outline" size="sm" className="gap-1.5">
+                    <Mail className="h-3.5 w-3.5" />
+                    Email
                   </Button>
                 </TrackedLink>
               )}

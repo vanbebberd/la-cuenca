@@ -1,7 +1,7 @@
 "use client";
 import { useEffect } from "react";
 
-type EventType = "VIEW" | "WHATSAPP_CLICK" | "CALL_CLICK" | "DIRECTIONS_CLICK" | "RESERVATION";
+type EventType = "VIEW" | "WHATSAPP_CLICK" | "CALL_CLICK" | "EMAIL_CLICK" | "DIRECTIONS_CLICK" | "RESERVATION";
 
 interface Props {
   businessId: string;

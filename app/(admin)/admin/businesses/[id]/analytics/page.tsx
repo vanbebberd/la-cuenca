@@ -3,15 +3,16 @@ import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Eye, MessageCircle, Phone, MapPin, CalendarCheck, TrendingUp } from "lucide-react";
+import { ArrowLeft, Eye, MessageCircle, Phone, Mail, MapPin, CalendarCheck, TrendingUp } from "lucide-react";
 
-interface Totals { VIEW?: number; WHATSAPP_CLICK?: number; CALL_CLICK?: number; DIRECTIONS_CLICK?: number; RESERVATION?: number; }
+interface Totals { VIEW?: number; WHATSAPP_CLICK?: number; CALL_CLICK?: number; EMAIL_CLICK?: number; DIRECTIONS_CLICK?: number; RESERVATION?: number; }
 interface DailyEntry { day: string; type: string; count: number; }
 
 const EVENT_CONFIG = {
   VIEW:             { label: "Visitas al perfil",  icon: Eye,           color: "bg-blue-50 text-blue-600 border-blue-100" },
   WHATSAPP_CLICK:   { label: "Clicks WhatsApp",    icon: MessageCircle, color: "bg-green-50 text-green-600 border-green-100" },
   CALL_CLICK:       { label: "Clicks Llamar",      icon: Phone,         color: "bg-purple-50 text-purple-600 border-purple-100" },
+  EMAIL_CLICK:      { label: "Clicks Email",        icon: Mail,          color: "bg-sky-50 text-sky-600 border-sky-100" },
   DIRECTIONS_CLICK: { label: "Clicks Cómo llegar", icon: MapPin,        color: "bg-orange-50 text-orange-600 border-orange-100" },
   RESERVATION:      { label: "Reservas",           icon: CalendarCheck, color: "bg-emerald-50 text-emerald-600 border-emerald-100" },
 } as const;

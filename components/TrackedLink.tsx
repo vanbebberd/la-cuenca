@@ -1,7 +1,7 @@
 "use client";
 import { track } from "@/components/BusinessTracker";
 
-type EventType = "WHATSAPP_CLICK" | "CALL_CLICK" | "DIRECTIONS_CLICK";
+type EventType = "WHATSAPP_CLICK" | "CALL_CLICK" | "EMAIL_CLICK" | "DIRECTIONS_CLICK";
 
 interface Props {
   href: string;
