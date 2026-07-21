@@ -13,14 +13,34 @@ const REQUIRED = ["nombre","categoria","ciudad"];
 const CSV_TEMPLATE = COLUMNS.join(",") + "\n" +
   "Café del Volcán,cafeterias,puerto-varas,+56912345678,,hola@cafe.cl,https://cafe.cl,@cafedelvolcan,,,El mejor café con vista al lago,Café en Puerto Varas,Av. Principal 123";
 
+function parseCSVLine(line: string): string[] {
+  const result: string[] = [];
+  let current = "";
+  let inQuotes = false;
+  for (let i = 0; i < line.length; i++) {
+    const ch = line[i];
+    if (ch === '"') {
+      if (inQuotes && line[i + 1] === '"') { current += '"'; i++; }
+      else { inQuotes = !inQuotes; }
+    } else if (ch === "," && !inQuotes) {
+      result.push(current.trim()); current = "";
+    } else {
+      current += ch;
+    }
+  }
+  result.push(current.trim());
+  return result;
+}
+
 function parseCSV(text: string): Row[] {
-  const lines = text.trim().split(/\r?\n/);
+  // Normalize line endings
+  const lines = text.replace(/\r\n/g, "\n").replace(/\r/g, "\n").trim().split("\n");
   if (lines.length < 2) return [];
-  const headers = lines[0].split(",").map(h => h.trim().toLowerCase().replace(/\s+/g, "_"));
+  const headers = parseCSVLine(lines[0]).map(h => h.toLowerCase().replace(/\s+/g, "_"));
   return lines.slice(1).filter(l => l.trim()).map(line => {
-    const vals = line.split(",");
+    const vals = parseCSVLine(line);
     const row: Row = {};
-    headers.forEach((h, i) => { row[h] = (vals[i] ?? "").trim().replace(/^"|"$/g, ""); });
+    headers.forEach((h, i) => { row[h] = vals[i] ?? ""; });
     return row;
   });
 }
