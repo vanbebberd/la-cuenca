@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
-import { Plus } from "lucide-react";
+import { Plus, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { priceRangeLabel } from "@/lib/utils";
@@ -20,9 +20,14 @@ export default async function AdminBusinessesPage() {
     <div className="p-6">
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-xl font-bold text-gray-900">Locales</h1>
-        <Link href="/admin/businesses/new">
-          <Button size="sm"><Plus className="h-4 w-4" />Nuevo local</Button>
-        </Link>
+        <div className="flex gap-2">
+          <Link href="/admin/businesses/import">
+            <Button size="sm" variant="outline" className="gap-1.5"><Upload className="h-4 w-4" />Importar CSV</Button>
+          </Link>
+          <Link href="/admin/businesses/new">
+            <Button size="sm"><Plus className="h-4 w-4" />Nuevo local</Button>
+          </Link>
+        </div>
       </div>
 
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
