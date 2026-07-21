@@ -56,7 +56,7 @@ interface Panorama {
 
 export default function PanoramaPage() {
   const searchParams = useSearchParams();
-  const [ciudad, setCiudad] = useState("");
+  const [ciudades, setCiudades] = useState<string[]>([]);
   const [tipo, setTipo] = useState(searchParams.get("tipo") ?? "");
   const [dias, setDias] = useState(searchParams.get("dias") ?? "");
   const [presupuesto, setPresupuesto] = useState("");
@@ -71,8 +71,12 @@ export default function PanoramaPage() {
     setIntereses((prev) => prev.includes(slug) ? prev.filter((s) => s !== slug) : [...prev, slug]);
   }
 
+  function toggleCiudad(slug: string) {
+    setCiudades(prev => prev.includes(slug) ? prev.filter(s => s !== slug) : [...prev, slug]);
+  }
+
   async function handleGenerar() {
-    if (!ciudad || !tipo || !presupuesto || !duracion) {
+    if (!ciudades.length || !tipo || !presupuesto || !duracion) {
       setError("Completa todos los campos para continuar");
       return;
     }
@@ -83,7 +87,7 @@ export default function PanoramaPage() {
       const res = await fetch("/api/panorama", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ciudad, tipo, presupuesto, duracion, dias, clima, intereses }),
+        body: JSON.stringify({ ciudades, tipo, presupuesto, duracion, dias, clima, intereses }),
       });
       let data: { error?: string } & Panorama | null = null;
       try { data = await res.json(); } catch { /* non-json response */ }
@@ -120,16 +124,17 @@ export default function PanoramaPage() {
           <>
             {/* Ciudad */}
             <div>
-              <p className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
+              <p className="text-sm font-semibold text-gray-700 mb-1 flex items-center gap-2">
                 <MapPin className="h-4 w-4 text-emerald-600" /> ¿En qué ciudad?
               </p>
+              <p className="text-xs text-gray-400 mb-3">Puedes elegir más de una</p>
               <div className="flex flex-wrap gap-2">
                 {CITIES.map((c) => (
                   <button
                     key={c.slug}
-                    onClick={() => setCiudad(c.slug)}
+                    onClick={() => toggleCiudad(c.slug)}
                     className={`px-4 py-2 rounded-xl border text-sm font-medium transition-all ${
-                      ciudad === c.slug
+                      ciudades.includes(c.slug)
                         ? "bg-gray-900 text-white border-gray-900"
                         : "bg-white border-gray-200 text-gray-700 hover:border-gray-400"
                     }`}

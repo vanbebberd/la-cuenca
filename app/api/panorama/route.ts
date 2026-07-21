@@ -6,7 +6,7 @@ import { z } from "zod";
 export const maxDuration = 60;
 
 const schema = z.object({
-  ciudad: z.string(),
+  ciudades: z.array(z.string()).min(1),
   tipo: z.string(),
   presupuesto: z.string(),
   duracion: z.string(),
@@ -21,32 +21,32 @@ export async function POST(req: NextRequest) {
   const parsed = schema.safeParse(body);
   if (!parsed.success) return NextResponse.json({ error: "Datos inválidos" }, { status: 400 });
 
-  const { ciudad, tipo, presupuesto, duracion, dias, clima, intereses } = parsed.data;
+  const { ciudades, tipo, presupuesto, duracion, dias, clima, intereses } = parsed.data;
 
   const businesses = await prisma.business.findMany({
     where: {
       status: "ACTIVE",
-      city: { slug: ciudad },
+      city: { slug: { in: ciudades } },
       ...(intereses.length > 0 && { category: { slug: { in: intereses } } }),
     },
     include: { category: true, city: true },
     orderBy: { avgRating: "desc" },
-    take: 30,
+    take: 40,
   });
 
   const allBusinesses = businesses.length < 5
     ? await prisma.business.findMany({
-        where: { status: "ACTIVE", city: { slug: ciudad } },
+        where: { status: "ACTIVE", city: { slug: { in: ciudades } } },
         include: { category: true, city: true },
         orderBy: { avgRating: "desc" },
-        take: 30,
+        take: 40,
       })
     : businesses;
 
-  const cityName = allBusinesses[0]?.city.name ?? ciudad;
+  const cityNames = [...new Set(allBusinesses.map(b => b.city.name))].join(" y ") || ciudades.join(" y ");
 
   const businessList = allBusinesses
-    .map((b) => `- ${b.name} (${b.category.name}${b.priceRange ? `, precio: ${b.priceRange}` : ""}${b.avgRating > 0 ? `, rating: ${b.avgRating.toFixed(1)}⭐` : ""})`)
+    .map((b) => `- ${b.name} [${b.city.name}] (${b.category.name}${b.priceRange ? `, precio: ${b.priceRange}` : ""}${b.avgRating > 0 ? `, rating: ${b.avgRating.toFixed(1)}⭐` : ""})`)
     .join("\n");
 
   if (!process.env.ANTHROPIC_API_KEY) {
@@ -76,7 +76,7 @@ Responde SIEMPRE en español y SOLO con un JSON válido con esta estructura exac
 Usa SOLO los locales de la lista. Si no hay suficientes, menciona actividades genéricas de la zona (el lago, el volcán Osorno) sin inventar nombres de locales.`;
 
   const userPrompt = `Arma un panorama para:
-- Ciudad: ${cityName}
+- Ciudad/es: ${cityNames}${ciudades.length > 1 ? " — el itinerario puede moverse entre estas ciudades" : ""}
 - Tipo de grupo: ${tipo}
 - Presupuesto: ${presupuesto}
 - Duración del día: ${duracion === "mañana" ? "solo la mañana (9:00-13:00)" : duracion === "tarde" ? "solo la tarde (14:00-20:00)" : "día completo (9:00-21:00)"}
@@ -84,14 +84,14 @@ Usa SOLO los locales de la lista. Si no hay suficientes, menciona actividades ge
 - Clima del día: ${clima === "soleado" ? "☀️ Soleado — aprovecha actividades al aire libre" : clima === "lluvioso" ? "🌧️ Lluvioso — prioriza actividades bajo techo, cafeterías, museos, restaurantes" : clima === "parcial" ? "⛅ Parcialmente nublado — mezcla de actividades" : "no especificado"}
 - Intereses: ${intereses.join(", ") || "variado"}
 
-Locales disponibles en ${cityName}:
+Locales disponibles en ${cityNames}:
 ${businessList || "No hay locales registrados aún, usa lugares conocidos de la zona."}`;
 
   let message;
   try {
     message = await client.messages.create({
       model: "claude-haiku-4-5-20251001",
-      max_tokens: 1500,
+      max_tokens: 3000,
       system: systemPrompt,
       messages: [{ role: "user", content: userPrompt }],
     });
@@ -105,7 +105,13 @@ ${businessList || "No hay locales registrados aún, usa lugares conocidos de la 
   const jsonMatch = text.match(/\{[\s\S]*\}/);
   if (!jsonMatch) return NextResponse.json({ error: "No se pudo generar el panorama" }, { status: 500 });
 
-  const panorama = JSON.parse(jsonMatch[0]);
+  let panorama: { titulo?: string; descripcion?: string; items?: { lugar: string }[]; consejos?: string[] } & Record<string, unknown>;
+  try {
+    panorama = JSON.parse(jsonMatch[0]);
+  } catch {
+    console.error("[panorama] JSON inválido:", jsonMatch[0].slice(0, 200));
+    return NextResponse.json({ error: "El panorama generado no es válido, intenta de nuevo" }, { status: 500 });
+  }
 
   // Build name→slug map for businesses that appear in the panorama
   const placesInPanorama: string[] = (panorama.items ?? []).map((i: { lugar: string }) => i.lugar);
