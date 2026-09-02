@@ -92,36 +92,8 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ── CATEGORÍAS ───────────────────────────────────────────────────── */}
-      <section className="py-12 bg-white">
-        <div className="max-w-5xl mx-auto px-4">
-          <div className="flex items-center justify-between mb-5">
-            <h2 className="text-2xl font-black text-gray-900">{t("by_category", lang)}</h2>
-            <Link href="/directory" className="hidden sm:flex items-center gap-1 text-sm font-medium text-gray-400 hover:text-gray-800 transition-colors">
-              {t("see_all", lang)} <ArrowRight className="h-3.5 w-3.5" />
-            </Link>
-          </div>
-
-          <div className="flex flex-wrap gap-2">
-            {CATEGORIES.map((cat) => {
-              const Icon = ICON_MAP[cat.icon] ?? Map;
-              return (
-                <Link
-                  key={cat.slug}
-                  href={`/directory?categoria=${cat.slug}`}
-                  className="group inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white px-3.5 py-2 text-sm font-medium text-gray-600 hover:border-emerald-300 hover:bg-emerald-50 hover:text-emerald-800 transition-colors"
-                >
-                  <Icon className="h-4 w-4 text-emerald-600 shrink-0" strokeWidth={2} />
-                  {cat.name}
-                </Link>
-              );
-            })}
-          </div>
-        </div>
-      </section>
-
       {/* ── CIUDADES ─────────────────────────────────────────────────────── */}
-      <section className="py-16 bg-gray-50">
+      <section className="py-16 bg-white">
         <div className="max-w-5xl mx-auto px-4">
           <h2 className="text-2xl font-black text-gray-900 mb-8">{t("by_city", lang)}</h2>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -151,6 +123,34 @@ export default async function HomePage() {
         </div>
       </section>
 
+      {/* ── CATEGORÍAS ───────────────────────────────────────────────────── */}
+      <section className="py-12 bg-gray-50">
+        <div className="max-w-5xl mx-auto px-4">
+          <div className="flex items-center justify-between mb-5">
+            <h2 className="text-2xl font-black text-gray-900">{t("by_category", lang)}</h2>
+            <Link href="/directory" className="hidden sm:flex items-center gap-1 text-sm font-medium text-gray-400 hover:text-gray-800 transition-colors">
+              {t("see_all", lang)} <ArrowRight className="h-3.5 w-3.5" />
+            </Link>
+          </div>
+
+          <div className="flex flex-wrap gap-2">
+            {CATEGORIES.map((cat) => {
+              const Icon = ICON_MAP[cat.icon] ?? Map;
+              return (
+                <Link
+                  key={cat.slug}
+                  href={`/directory?categoria=${cat.slug}`}
+                  className="group inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white px-3.5 py-2 text-sm font-medium text-gray-600 hover:border-emerald-300 hover:bg-emerald-50 hover:text-emerald-800 transition-colors"
+                >
+                  <Icon className="h-4 w-4 text-emerald-600 shrink-0" strokeWidth={2} />
+                  {cat.name}
+                </Link>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
       {/* ── RECOMENDADOS ─────────────────────────────────────────────────── */}
       {featured.length > 0 && (
         <section className="py-16 bg-white">
@@ -173,9 +173,51 @@ export default async function HomePage() {
         </section>
       )}
 
+      {/* ── IMPERDIBLES (editorial) ──────────────────────────────────────── */}
+      {posts.length > 0 && (
+        <section className="py-16 bg-gray-50">
+          <div className="max-w-6xl mx-auto px-4">
+            <h2 className="text-2xl font-black text-gray-900 mb-8">
+              {postsTitleSetting?.value ?? "Imperdibles de La Cuenca"}
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+              {posts.map((post) => {
+                const inner = (
+                  <div className="group h-full flex flex-col bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-lg transition-all duration-300">
+                    <div className="relative h-48 bg-gradient-to-br from-gray-100 to-gray-50 overflow-hidden shrink-0">
+                      {post.image ? (
+                        <Image src={post.image} alt={post.title} fill className="object-cover group-hover:scale-105 transition-transform duration-500" sizes="420px" />
+                      ) : (
+                        <div className="absolute inset-0 flex items-center justify-center text-5xl opacity-20">📝</div>
+                      )}
+                    </div>
+                    <div className="p-5 flex flex-col flex-1">
+                      <h3 className="font-black text-gray-900 text-base leading-snug mb-2">{post.title}</h3>
+                      {post.excerpt && <p className="text-sm text-gray-500 leading-relaxed flex-1">{post.excerpt}</p>}
+                      {post.linkUrl && (
+                        <span className="mt-4 inline-flex items-center gap-1 text-xs font-semibold text-emerald-600 group-hover:text-emerald-700">
+                          Ver más <ArrowRight className="h-3.5 w-3.5" />
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                );
+                return post.linkUrl ? (
+                  <a key={post.id} href={post.linkUrl} target={post.linkUrl.startsWith("http") ? "_blank" : undefined} rel="noopener noreferrer" className="block h-full">
+                    {inner}
+                  </a>
+                ) : (
+                  <div key={post.id} className="h-full">{inner}</div>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* ── EVENTOS ──────────────────────────────────────────────────────── */}
       {upcomingEvents.length > 0 && (
-        <section className="py-16 bg-gray-50">
+        <section className="py-16 bg-white">
           <div className="max-w-6xl mx-auto px-4">
             <div className="flex items-center justify-between mb-8">
               <div>
@@ -225,7 +267,7 @@ export default async function HomePage() {
       )}
 
       {/* ── FEATURES ─────────────────────────────────────────────────────── */}
-      <section className="py-20 bg-white">
+      <section className="py-20 bg-gray-50">
         <div className="max-w-6xl mx-auto px-4">
           <div className="text-center mb-12">
             <p className="text-emerald-600 text-sm font-bold uppercase tracking-widest mb-2">{t("why_tag", lang)}</p>
@@ -339,48 +381,6 @@ export default async function HomePage() {
           </Link>
         </div>
       </section>
-
-      {/* ── DESTACADOS EDITORIALES ───────────────────────────────────────── */}
-      {posts.length > 0 && (
-        <section className="py-16 bg-white">
-          <div className="max-w-6xl mx-auto px-4">
-            <h2 className="text-2xl font-black text-gray-900 mb-8">
-              {postsTitleSetting?.value ?? "Imperdibles de La Cuenca"}
-            </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-              {posts.map((post) => {
-                const inner = (
-                  <div className="group h-full flex flex-col bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-lg transition-all duration-300">
-                    <div className="relative h-48 bg-gradient-to-br from-gray-100 to-gray-50 overflow-hidden shrink-0">
-                      {post.image ? (
-                        <Image src={post.image} alt={post.title} fill className="object-cover group-hover:scale-105 transition-transform duration-500" sizes="420px" />
-                      ) : (
-                        <div className="absolute inset-0 flex items-center justify-center text-5xl opacity-20">📝</div>
-                      )}
-                    </div>
-                    <div className="p-5 flex flex-col flex-1">
-                      <h3 className="font-black text-gray-900 text-base leading-snug mb-2">{post.title}</h3>
-                      {post.excerpt && <p className="text-sm text-gray-500 leading-relaxed flex-1">{post.excerpt}</p>}
-                      {post.linkUrl && (
-                        <span className="mt-4 inline-flex items-center gap-1 text-xs font-semibold text-emerald-600 group-hover:text-emerald-700">
-                          Ver más <ArrowRight className="h-3.5 w-3.5" />
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                );
-                return post.linkUrl ? (
-                  <a key={post.id} href={post.linkUrl} target={post.linkUrl.startsWith("http") ? "_blank" : undefined} rel="noopener noreferrer" className="block h-full">
-                    {inner}
-                  </a>
-                ) : (
-                  <div key={post.id} className="h-full">{inner}</div>
-                );
-              })}
-            </div>
-          </div>
-        </section>
-      )}
 
     </div>
   );
