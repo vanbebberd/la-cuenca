@@ -8,10 +8,12 @@ export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma) as NextAuthOptions["adapter"],
   providers: [
     // Login por email.
-    // - La cuenta admin (ADMIN_EMAIL) SIEMPRE exige ADMIN_PASSWORD.
-    // - USER normal: passwordless (se crea la cuenta al vuelo).
-    // - BUSINESS_OWNER: passwordless bloqueado SOLO si Google OAuth está
-    //   configurado (para no dejar sin acceso a dueños que hoy entran por email).
+    // - Si ADMIN_PASSWORD está configurada, la cuenta ADMIN_EMAIL debe usarla
+    //   (y esa es la única vía para obtener rol ADMIN por credenciales).
+    // - Si NO está configurada, el login es passwordless y el rol SIEMPRE
+    //   sale de la base de datos — nunca se escala por variable de entorno.
+    // - Passwordless queda bloqueado para cuentas privilegiadas solo si hay
+    //   Google OAuth configurado (para que tengan una vía alternativa).
     CredentialsProvider({
       name: "Email",
       credentials: {
@@ -23,12 +25,12 @@ export const authOptions: NextAuthOptions = {
         if (!email) return null;
         try {
           const adminEmail = process.env.ADMIN_EMAIL?.trim().toLowerCase();
+          const adminPassword = process.env.ADMIN_PASSWORD;
           const isAdminEmail = !!adminEmail && adminEmail === email;
 
-          if (isAdminEmail) {
-            const expected = process.env.ADMIN_PASSWORD;
-            if (!expected || credentials?.password !== expected) {
-              console.warn("[auth] login admin rechazado: contraseña incorrecta o ADMIN_PASSWORD sin configurar");
+          if (isAdminEmail && adminPassword) {
+            if (credentials?.password !== adminPassword) {
+              console.warn("[auth] login admin rechazado: contraseña incorrecta");
               return null;
             }
             const user = await prisma.user.upsert({
@@ -46,6 +48,8 @@ export const authOptions: NextAuthOptions = {
             return null;
           }
 
+          // Passwordless: el rol viene de la DB tal cual; si el usuario no
+          // existe, se crea como USER. Nunca se crea ni promueve un ADMIN aquí.
           const user = existing ?? (await prisma.user.create({
             data: { email, name: email.split("@")[0], role: "USER" },
           }));
