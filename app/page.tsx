@@ -266,31 +266,6 @@ export default async function HomePage() {
         </section>
       )}
 
-      {/* ── FEATURES ─────────────────────────────────────────────────────── */}
-      <section className="py-20 bg-gray-50">
-        <div className="max-w-6xl mx-auto px-4">
-          <div className="text-center mb-12">
-            <p className="text-emerald-600 text-sm font-bold uppercase tracking-widest mb-2">{t("why_tag", lang)}</p>
-            <h2 className="text-4xl font-black text-gray-900">{t("why_title", lang)}</h2>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-            {[
-              { icon: Star,   labelKey: "feat1_label" as const, descKey: "feat1_desc" as const, color: "text-amber-500",   bg: "bg-amber-50",   border: "border-amber-100" },
-              { icon: Gift,   labelKey: "feat2_label" as const, descKey: "feat2_desc" as const, color: "text-emerald-600", bg: "bg-emerald-50", border: "border-emerald-100" },
-              { icon: Ticket, labelKey: "feat3_label" as const, descKey: "feat3_desc" as const, color: "text-blue-500",    bg: "bg-blue-50",    border: "border-blue-100" },
-            ].map(({ icon: Icon, labelKey, descKey, color, bg, border }) => (
-              <div key={labelKey} className={`rounded-2xl border ${border} ${bg} p-8`}>
-                <div className="w-12 h-12 rounded-2xl bg-white flex items-center justify-center mb-5 shadow-sm">
-                  <Icon className={`h-6 w-6 ${color}`} />
-                </div>
-                <h3 className="font-black text-gray-900 text-lg mb-2">{t(labelKey, lang)}</h3>
-                <p className="text-sm text-gray-500 leading-relaxed">{t(descKey, lang)}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* ── LAKI ─────────────────────────────────────────────────────────── */}
       <section className="relative overflow-hidden bg-gray-950 py-24">
         <div className="absolute inset-0 opacity-15">
@@ -357,6 +332,31 @@ export default async function HomePage() {
                 ))}
               </div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── ¿POR QUÉ LA CUENCA? ──────────────────────────────────────────── */}
+      <section className="py-20 bg-white">
+        <div className="max-w-6xl mx-auto px-4">
+          <div className="text-center mb-12">
+            <p className="text-emerald-600 text-sm font-bold uppercase tracking-widest mb-2">{t("why_tag", lang)}</p>
+            <h2 className="text-4xl font-black text-gray-900">{t("why_title", lang)}</h2>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+            {[
+              { icon: Star,   labelKey: "feat1_label" as const, descKey: "feat1_desc" as const, color: "text-amber-500",   bg: "bg-amber-50",   border: "border-amber-100" },
+              { icon: Gift,   labelKey: "feat2_label" as const, descKey: "feat2_desc" as const, color: "text-emerald-600", bg: "bg-emerald-50", border: "border-emerald-100" },
+              { icon: Ticket, labelKey: "feat3_label" as const, descKey: "feat3_desc" as const, color: "text-blue-500",    bg: "bg-blue-50",    border: "border-blue-100" },
+            ].map(({ icon: Icon, labelKey, descKey, color, bg, border }) => (
+              <div key={labelKey} className={`rounded-2xl border ${border} ${bg} p-8`}>
+                <div className="w-12 h-12 rounded-2xl bg-white flex items-center justify-center mb-5 shadow-sm">
+                  <Icon className={`h-6 w-6 ${color}`} />
+                </div>
+                <h3 className="font-black text-gray-900 text-lg mb-2">{t(labelKey, lang)}</h3>
+                <p className="text-sm text-gray-500 leading-relaxed">{t(descKey, lang)}</p>
+              </div>
+            ))}
           </div>
         </div>
       </section>
