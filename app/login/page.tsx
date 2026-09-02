@@ -12,6 +12,8 @@ function LoginForm() {
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl") ?? "/";
   const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [showAdmin, setShowAdmin] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -21,6 +23,7 @@ function LoginForm() {
     setError("");
     const res = await signIn("credentials", {
       email,
+      password: showAdmin ? password : undefined,
       redirect: false,
       callbackUrl,
     });
@@ -76,6 +79,18 @@ function LoginForm() {
                 className="h-11"
               />
             </div>
+            {showAdmin && (
+              <div>
+                <label className="text-xs font-semibold text-gray-600 mb-1.5 block">Contraseña de administrador</label>
+                <Input
+                  type="password"
+                  placeholder="••••••••"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="h-11"
+                />
+              </div>
+            )}
             {error && (
               <p className="text-xs text-red-500 bg-red-50 rounded-lg px-3 py-2">{error}</p>
             )}
@@ -94,6 +109,14 @@ function LoginForm() {
             Si no tienes cuenta, se crea automáticamente.<br />
             No necesitas contraseña.
           </p>
+
+          <button
+            type="button"
+            onClick={() => setShowAdmin((v) => !v)}
+            className="text-[11px] text-gray-300 hover:text-gray-500 w-full text-center"
+          >
+            {showAdmin ? "Ocultar acceso administrador" : "Acceso administrador"}
+          </button>
         </div>
       </div>
     </div>
