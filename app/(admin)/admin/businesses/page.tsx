@@ -1,3 +1,5 @@
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { Plus, Upload } from "lucide-react";
@@ -11,7 +13,13 @@ export const metadata: Metadata = { title: "Admin — Locales" };
 export const dynamic = "force-dynamic";
 
 export default async function AdminBusinessesPage() {
+  const session = await getServerSession(authOptions);
+  const role = (session?.user as { role?: string })?.role;
+  const userId = (session?.user as { id?: string })?.id;
+  const isAdmin = role === "ADMIN";
+
   const businesses = await prisma.business.findMany({
+    where: isAdmin ? undefined : { ownerId: userId },
     include: { city: true, category: true },
     orderBy: { createdAt: "desc" },
   });
@@ -21,9 +29,11 @@ export default async function AdminBusinessesPage() {
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-xl font-bold text-gray-900">Locales</h1>
         <div className="flex gap-2">
-          <Link href="/admin/businesses/import">
-            <Button size="sm" variant="outline" className="gap-1.5"><Upload className="h-4 w-4" />Importar CSV</Button>
-          </Link>
+          {isAdmin && (
+            <Link href="/admin/businesses/import">
+              <Button size="sm" variant="outline" className="gap-1.5"><Upload className="h-4 w-4" />Importar CSV</Button>
+            </Link>
+          )}
           <Link href="/admin/businesses/new">
             <Button size="sm"><Plus className="h-4 w-4" />Nuevo local</Button>
           </Link>
@@ -63,7 +73,7 @@ export default async function AdminBusinessesPage() {
                   </Badge>
                 </td>
                 <td className="px-4 py-3">
-                  <BusinessActions id={b.id} slug={b.slug} status={b.status} />
+                  <BusinessActions id={b.id} slug={b.slug} status={b.status} isAdmin={isAdmin} />
                 </td>
               </tr>
             ))}

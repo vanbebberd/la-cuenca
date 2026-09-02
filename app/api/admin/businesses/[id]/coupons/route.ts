@@ -1,18 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { requireBusinessAccess } from "@/lib/business-access";
 
 type Params = { params: Promise<{ id: string }> };
 
-function auth() {
-  return getServerSession(authOptions).then((s) => (s?.user as any)?.role as string | undefined);
-}
-
 export async function GET(_req: NextRequest, { params }: Params) {
-  const role = await auth();
-  if (role !== "ADMIN" && role !== "BUSINESS_OWNER") return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   const { id } = await params;
+  const access = await requireBusinessAccess(id);
+  if (!access.ok) return access.response;
   const coupons = await prisma.coupon.findMany({
     where: { businessId: id },
     orderBy: { createdAt: "desc" },
@@ -21,9 +16,9 @@ export async function GET(_req: NextRequest, { params }: Params) {
 }
 
 export async function POST(req: NextRequest, { params }: Params) {
-  const role = await auth();
-  if (role !== "ADMIN" && role !== "BUSINESS_OWNER") return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   const { id } = await params;
+  const access = await requireBusinessAccess(id);
+  if (!access.ok) return access.response;
   try {
     const body = await req.json();
     const { code, title, description, discountType, discountValue, minPurchase, maxUses, validFrom, validTo } = body;
@@ -45,34 +40,36 @@ export async function POST(req: NextRequest, { params }: Params) {
       },
     });
     return NextResponse.json(coupon, { status: 201 });
-  } catch (err: any) {
-    if (err?.code === "P2002") return NextResponse.json({ error: "El código ya existe, usa uno diferente" }, { status: 409 });
-    return NextResponse.json({ error: String(err?.message ?? "Error") }, { status: 500 });
+  } catch (err: unknown) {
+    if ((err as { code?: string })?.code === "P2002")
+      return NextResponse.json({ error: "El código ya existe, usa uno diferente" }, { status: 409 });
+    return NextResponse.json({ error: String((err as Error)?.message ?? "Error") }, { status: 500 });
   }
 }
 
 export async function PATCH(req: NextRequest, { params }: Params) {
-  const role = await auth();
-  if (role !== "ADMIN" && role !== "BUSINESS_OWNER") return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  await params;
+  const { id } = await params;
+  const access = await requireBusinessAccess(id);
+  if (!access.ok) return access.response;
   try {
     const { couponId, active } = await req.json();
-    const coupon = await prisma.coupon.update({ where: { id: couponId }, data: { active } });
-    return NextResponse.json(coupon);
-  } catch (err: any) {
-    return NextResponse.json({ error: String(err?.message ?? "Error") }, { status: 500 });
+    const { count } = await prisma.coupon.updateMany({ where: { id: couponId, businessId: id }, data: { active } });
+    if (count === 0) return NextResponse.json({ error: "No encontrado" }, { status: 404 });
+    return NextResponse.json({ ok: true });
+  } catch (err: unknown) {
+    return NextResponse.json({ error: String((err as Error)?.message ?? "Error") }, { status: 500 });
   }
 }
 
 export async function DELETE(req: NextRequest, { params }: Params) {
-  const role = await auth();
-  if (role !== "ADMIN" && role !== "BUSINESS_OWNER") return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  await params;
+  const { id } = await params;
+  const access = await requireBusinessAccess(id);
+  if (!access.ok) return access.response;
   try {
     const { couponId } = await req.json();
-    await prisma.coupon.delete({ where: { id: couponId } });
+    await prisma.coupon.deleteMany({ where: { id: couponId, businessId: id } });
     return NextResponse.json({ ok: true });
-  } catch (err: any) {
-    return NextResponse.json({ error: String(err?.message ?? "Error") }, { status: 500 });
+  } catch (err: unknown) {
+    return NextResponse.json({ error: String((err as Error)?.message ?? "Error") }, { status: 500 });
   }
 }

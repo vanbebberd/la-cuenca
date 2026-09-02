@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { requireBusinessAccess } from "@/lib/business-access";
 import { z } from "zod";
 
 const schema = z.object({
@@ -11,14 +10,10 @@ const schema = z.object({
   validTo: z.string().optional(),
 });
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function isAdmin(session: any) {
-  const role = session?.user?.role as string | undefined;
-  return !!session && (role === "ADMIN" || role === "BUSINESS_OWNER");
-}
-
 export async function GET(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
+  const access = await requireBusinessAccess(id);
+  if (!access.ok) return access.response;
   const offers = await prisma.offer.findMany({
     where: { businessId: id },
     orderBy: { createdAt: "desc" },
@@ -27,11 +22,11 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
 }
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const session = await getServerSession(authOptions);
-  if (!isAdmin(session)) return NextResponse.json({ error: "No autorizado" }, { status: 403 });
   const { id } = await params;
-  const body = await req.json();
-  const parsed = schema.safeParse(body);
+  const access = await requireBusinessAccess(id);
+  if (!access.ok) return access.response;
+
+  const parsed = schema.safeParse(await req.json());
   if (!parsed.success) return NextResponse.json({ error: "Datos inválidos" }, { status: 400 });
   const offer = await prisma.offer.create({
     data: {
@@ -45,18 +40,27 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   return NextResponse.json(offer);
 }
 
-export async function PATCH(req: NextRequest) {
-  const session = await getServerSession(authOptions);
-  if (!isAdmin(session)) return NextResponse.json({ error: "No autorizado" }, { status: 403 });
+export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const access = await requireBusinessAccess(id);
+  if (!access.ok) return access.response;
+
   const { offerId, active } = await req.json();
-  const offer = await prisma.offer.update({ where: { id: offerId }, data: { active } });
-  return NextResponse.json(offer);
+  const { count } = await prisma.offer.updateMany({
+    where: { id: offerId, businessId: id },
+    data: { active },
+  });
+  if (count === 0) return NextResponse.json({ error: "No encontrado" }, { status: 404 });
+  return NextResponse.json({ ok: true });
 }
 
-export async function DELETE(req: NextRequest) {
-  const session = await getServerSession(authOptions);
-  if (!isAdmin(session)) return NextResponse.json({ error: "No autorizado" }, { status: 403 });
+export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const access = await requireBusinessAccess(id);
+  if (!access.ok) return access.response;
+
   const { offerId } = await req.json();
-  await prisma.offer.delete({ where: { id: offerId } });
+  const { count } = await prisma.offer.deleteMany({ where: { id: offerId, businessId: id } });
+  if (count === 0) return NextResponse.json({ error: "No encontrado" }, { status: 404 });
   return NextResponse.json({ ok: true });
 }

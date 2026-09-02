@@ -1,15 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { requireBusinessAccess } from "@/lib/business-access";
 
 export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const session = await getServerSession(authOptions);
-  const role = (session?.user as { role?: string })?.role;
-  if (!session || (role !== "ADMIN" && role !== "BUSINESS_OWNER")) {
-    return NextResponse.json({ error: "No autorizado" }, { status: 403 });
-  }
   const { id } = await params;
+  const photo = await prisma.businessPhoto.findUnique({
+    where: { id },
+    select: { businessId: true },
+  });
+  if (!photo) return NextResponse.json({ error: "No encontrado" }, { status: 404 });
+
+  const access = await requireBusinessAccess(photo.businessId);
+  if (!access.ok) return access.response;
+
   await prisma.businessPhoto.delete({ where: { id } });
   return NextResponse.json({ ok: true });
 }

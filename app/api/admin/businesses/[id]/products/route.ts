@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { requireBusinessAccess } from "@/lib/business-access";
 import { z } from "zod";
 
 const productSchema = z.object({
@@ -19,14 +18,10 @@ const sectionSchema = z.object({
   sectionOrder: z.number().optional(),
 });
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function isAdmin(session: any) {
-  const role = session?.user?.role as string | undefined;
-  return !!session && (role === "ADMIN" || role === "BUSINESS_OWNER");
-}
-
 export async function GET(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
+  const access = await requireBusinessAccess(id);
+  if (!access.ok) return access.response;
   const [sections, products] = await Promise.all([
     prisma.productSection.findMany({ where: { businessId: id }, orderBy: { order: "asc" } }),
     prisma.product.findMany({ where: { businessId: id }, orderBy: [{ sectionId: "asc" }, { order: "asc" }] }),
@@ -35,12 +30,11 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
 }
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const session = await getServerSession(authOptions);
-  if (!isAdmin(session)) return NextResponse.json({ error: "No autorizado" }, { status: 403 });
   const { id } = await params;
+  const access = await requireBusinessAccess(id);
+  if (!access.ok) return access.response;
   const body = await req.json();
 
-  // Create a section
   if (body.type === "section") {
     const parsed = sectionSchema.safeParse(body);
     if (!parsed.success) return NextResponse.json({ error: "Datos inválidos" }, { status: 400 });
@@ -50,7 +44,6 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     return NextResponse.json(section);
   }
 
-  // Create a product
   const parsed = productSchema.safeParse(body);
   if (!parsed.success) return NextResponse.json({ error: "Datos inválidos" }, { status: 400 });
   const product = await prisma.product.create({
@@ -60,29 +53,31 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 }
 
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const session = await getServerSession(authOptions);
-  if (!isAdmin(session)) return NextResponse.json({ error: "No autorizado" }, { status: 403 });
-  await params;
+  const { id } = await params;
+  const access = await requireBusinessAccess(id);
+  if (!access.ok) return access.response;
   const { productId, sectionId, ...data } = await req.json();
 
   if (sectionId && !productId) {
-    const section = await prisma.productSection.update({ where: { id: sectionId }, data });
-    return NextResponse.json(section);
+    const { count } = await prisma.productSection.updateMany({ where: { id: sectionId, businessId: id }, data });
+    if (count === 0) return NextResponse.json({ error: "No encontrado" }, { status: 404 });
+    return NextResponse.json({ ok: true });
   }
-  const product = await prisma.product.update({ where: { id: productId }, data });
-  return NextResponse.json(product);
+  const { count } = await prisma.product.updateMany({ where: { id: productId, businessId: id }, data });
+  if (count === 0) return NextResponse.json({ error: "No encontrado" }, { status: 404 });
+  return NextResponse.json({ ok: true });
 }
 
 export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const session = await getServerSession(authOptions);
-  if (!isAdmin(session)) return NextResponse.json({ error: "No autorizado" }, { status: 403 });
-  await params;
+  const { id } = await params;
+  const access = await requireBusinessAccess(id);
+  if (!access.ok) return access.response;
   const { productId, sectionId } = await req.json();
 
   if (sectionId) {
-    await prisma.productSection.delete({ where: { id: sectionId } });
+    await prisma.productSection.deleteMany({ where: { id: sectionId, businessId: id } });
   } else {
-    await prisma.product.delete({ where: { id: productId } });
+    await prisma.product.deleteMany({ where: { id: productId, businessId: id } });
   }
   return NextResponse.json({ ok: true });
 }

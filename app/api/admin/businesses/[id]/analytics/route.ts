@@ -1,15 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { requireBusinessAccess } from "@/lib/business-access";
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const session = await getServerSession(authOptions);
-  const role = (session?.user as { role?: string })?.role;
-  if (!session || (role !== "ADMIN" && role !== "BUSINESS_OWNER"))
-    return NextResponse.json({ error: "No autorizado" }, { status: 403 });
-
   const { id } = await params;
+  const access = await requireBusinessAccess(id);
+  if (!access.ok) return access.response;
+
   const { searchParams } = new URL(req.url);
   const days = parseInt(searchParams.get("days") ?? "30");
   const since = new Date(Date.now() - days * 24 * 60 * 60 * 1000);

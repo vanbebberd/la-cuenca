@@ -1,16 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { requireBusinessAccess } from "@/lib/business-access";
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const session = await getServerSession(authOptions);
-  const role = (session?.user as { role?: string })?.role;
-  if (!session || (role !== "ADMIN" && role !== "BUSINESS_OWNER")) {
-    return NextResponse.json({ error: "No autorizado" }, { status: 403 });
-  }
   const { id } = await params;
+  const access = await requireBusinessAccess(id);
+  if (!access.ok) return access.response;
+
   const { hours } = await req.json();
+  if (!Array.isArray(hours)) {
+    return NextResponse.json({ error: "Datos inválidos" }, { status: 400 });
+  }
 
   await prisma.$transaction([
     prisma.businessHours.deleteMany({ where: { businessId: id } }),

@@ -1,15 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { requireBusinessAccess } from "@/lib/business-access";
 
 export async function GET(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const session = await getServerSession(authOptions);
-  const role = (session?.user as { role?: string })?.role;
-  if (!session || (role !== "ADMIN" && role !== "BUSINESS_OWNER")) {
-    return NextResponse.json({ error: "No autorizado" }, { status: 403 });
-  }
   const { id } = await params;
+  const access = await requireBusinessAccess(id);
+  if (!access.ok) return access.response;
   const photos = await prisma.businessPhoto.findMany({
     where: { businessId: id },
     orderBy: { order: "asc" },
@@ -18,12 +14,9 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
 }
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const session = await getServerSession(authOptions);
-  const role = (session?.user as { role?: string })?.role;
-  if (!session || (role !== "ADMIN" && role !== "BUSINESS_OWNER")) {
-    return NextResponse.json({ error: "No autorizado" }, { status: 403 });
-  }
   const { id } = await params;
+  const access = await requireBusinessAccess(id);
+  if (!access.ok) return access.response;
   const { url, alt } = await req.json();
   if (!url) return NextResponse.json({ error: "URL requerida" }, { status: 400 });
 

@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Eye, Pencil, CheckCircle, XCircle, Trash2 } from "lucide-react";
 import Link from "next/link";
 
-export function BusinessActions({ id, slug, status }: { id: string; slug: string; status: string }) {
+export function BusinessActions({ id, slug, status, isAdmin = false }: { id: string; slug: string; status: string; isAdmin?: boolean }) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
 
@@ -33,14 +33,18 @@ export function BusinessActions({ id, slug, status }: { id: string; slug: string
       <Link href={`/admin/businesses/${id}/edit`}>
         <Button variant="ghost" size="icon" className="h-7 w-7"><Pencil className="h-3.5 w-3.5" /></Button>
       </Link>
-      <Button variant="ghost" size="icon" className="h-7 w-7" onClick={toggle} disabled={loading}>
-        {status === "ACTIVE"
-          ? <XCircle className="h-4 w-4 text-red-400" />
-          : <CheckCircle className="h-4 w-4 text-emerald-400" />}
-      </Button>
-      <Button variant="ghost" size="icon" className="h-7 w-7" onClick={handleDelete} disabled={loading}>
-        <Trash2 className="h-4 w-4 text-gray-300 hover:text-red-500" />
-      </Button>
+      {isAdmin && (
+        <>
+          <Button variant="ghost" size="icon" className="h-7 w-7" onClick={toggle} disabled={loading}>
+            {status === "ACTIVE"
+              ? <XCircle className="h-4 w-4 text-red-400" />
+              : <CheckCircle className="h-4 w-4 text-emerald-400" />}
+          </Button>
+          <Button variant="ghost" size="icon" className="h-7 w-7" onClick={handleDelete} disabled={loading}>
+            <Trash2 className="h-4 w-4 text-gray-300 hover:text-red-500" />
+          </Button>
+        </>
+      )}
     </div>
   );
 }
