@@ -48,8 +48,20 @@ export const authOptions: NextAuthOptions = {
             return null;
           }
 
-          // Passwordless: el rol viene de la DB tal cual; si el usuario no
-          // existe, se crea como USER. Nunca se crea ni promueve un ADMIN aquí.
+          // Sin ADMIN_PASSWORD configurada, la cuenta ADMIN_EMAIL entra
+          // passwordless y se le asegura el rol ADMIN (comportamiento
+          // histórico). Definir ADMIN_PASSWORD activa el candado real.
+          if (isAdminEmail) {
+            const user = await prisma.user.upsert({
+              where: { email },
+              update: { role: "ADMIN" },
+              create: { email, name: email.split("@")[0], role: "ADMIN" },
+            });
+            return { id: user.id, email: user.email, name: user.name, image: user.image, role: user.role };
+          }
+
+          // Resto: passwordless. El rol viene de la DB tal cual; si el
+          // usuario no existe, se crea como USER.
           const user = existing ?? (await prisma.user.create({
             data: { email, name: email.split("@")[0], role: "USER" },
           }));
