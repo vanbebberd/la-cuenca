@@ -9,6 +9,7 @@ import {
   ArrowRight, CheckCircle2, Calendar,
 } from "lucide-react";
 import { type LucideIcon } from "lucide-react";
+import { cookies } from "next/headers";
 import { Button } from "@/components/ui/button";
 import { CATEGORIES } from "@/lib/constants";
 import { LakiHero } from "@/components/LakiHero";
@@ -22,9 +23,13 @@ const ICON_MAP: Record<string, LucideIcon> = {
   Activity, ShoppingBag, Bike, GlassWater, Heart, Wrench, Camera, Compass,
 };
 
-// ── Cambia esta URL para actualizar el banner del hero ───────────────────────
-// Puede ser una URL de Unsplash, Cloudinary, o una imagen local en /public (ej: "/hero.jpg")
-const HERO_IMAGE = "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=1920&q=90";
+// ── Fotos del hero ──────────────────────────────────────────────────────────
+// Se elige una por sesión (cookie "hero" seteada en proxy.ts). Para
+// agregar/quitar variantes: editar esta lista y HERO_VARIANTS en proxy.ts.
+const HERO_IMAGES = [
+  "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=1920&q=90",
+  "/cuenca.jpg",
+];
 
 const CITY_PHOTOS: Record<string, string> = {
   "puerto-montt": "https://images.unsplash.com/photo-1553761984-30e1bfcb8bdb?w=600&q=80",
@@ -37,6 +42,8 @@ const CITY_PHOTOS: Record<string, string> = {
 
 export default async function HomePage() {
   const lang = await getLang();
+  const heroPick = Number((await cookies()).get("hero")?.value);
+  const HERO_IMAGE = HERO_IMAGES[heroPick] ?? HERO_IMAGES[0];
 
   const [featured, cities, upcomingEvents, posts, postsTitleSetting] = await Promise.all([
     prisma.business.findMany({
