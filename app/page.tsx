@@ -177,11 +177,17 @@ export default async function HomePage() {
       {posts.length > 0 && (
         <section className="py-16 bg-gray-50">
           <div className="max-w-6xl mx-auto px-4">
-            <h2 className="text-2xl font-black text-gray-900 mb-8">
-              {postsTitleSetting?.value ?? "Imperdibles de La Cuenca"}
-            </h2>
+            <div className="flex items-center justify-between mb-8">
+              <h2 className="text-2xl font-black text-gray-900">
+                {postsTitleSetting?.value ?? "Imperdibles de La Cuenca"}
+              </h2>
+              <Link href="/imperdibles" className="hidden sm:flex items-center gap-1 text-sm font-medium text-gray-400 hover:text-gray-800 transition-colors">
+                Ver todas <ArrowRight className="h-3.5 w-3.5" />
+              </Link>
+            </div>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
               {posts.map((post) => {
+                const to = post.slug ? `/imperdibles/${post.slug}` : post.linkUrl;
                 const inner = (
                   <div className="group h-full flex flex-col bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-lg transition-all duration-300">
                     <div className="relative h-48 bg-gradient-to-br from-gray-100 to-gray-50 overflow-hidden shrink-0">
@@ -194,20 +200,19 @@ export default async function HomePage() {
                     <div className="p-5 flex flex-col flex-1">
                       <h3 className="font-black text-gray-900 text-base leading-snug mb-2">{post.title}</h3>
                       {post.excerpt && <p className="text-sm text-gray-500 leading-relaxed flex-1">{post.excerpt}</p>}
-                      {post.linkUrl && (
+                      {to && (
                         <span className="mt-4 inline-flex items-center gap-1 text-xs font-semibold text-emerald-600 group-hover:text-emerald-700">
-                          Ver más <ArrowRight className="h-3.5 w-3.5" />
+                          {post.slug ? "Leer" : "Ver más"} <ArrowRight className="h-3.5 w-3.5" />
                         </span>
                       )}
                     </div>
                   </div>
                 );
-                return post.linkUrl ? (
-                  <a key={post.id} href={post.linkUrl} target={post.linkUrl.startsWith("http") ? "_blank" : undefined} rel="noopener noreferrer" className="block h-full">
-                    {inner}
-                  </a>
+                if (!to) return <div key={post.id} className="h-full">{inner}</div>;
+                return to.startsWith("http") ? (
+                  <a key={post.id} href={to} target="_blank" rel="noopener noreferrer" className="block h-full">{inner}</a>
                 ) : (
-                  <div key={post.id} className="h-full">{inner}</div>
+                  <Link key={post.id} href={to} className="block h-full">{inner}</Link>
                 );
               })}
             </div>

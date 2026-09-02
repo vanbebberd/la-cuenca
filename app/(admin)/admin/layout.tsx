@@ -12,7 +12,7 @@ const ADMIN_NAV = [
   { href: "/admin/reservations", label: "Reservas", icon: CalendarDays, adminOnly: false },
   { href: "/admin/planes", label: "Planes", icon: CreditCard, adminOnly: true },
   { href: "/admin/events", label: "Eventos", icon: Ticket, adminOnly: false },
-  { href: "/admin/posts",  label: "Destacados", icon: FileText, adminOnly: false },
+  { href: "/admin/posts",  label: "Imperdibles", icon: FileText, adminOnly: false },
   { href: "/admin/categories", label: "Categorías", icon: Tag, adminOnly: true },
   { href: "/admin/cities", label: "Ciudades", icon: MapPin, adminOnly: true },
   { href: "/admin/points", label: "Puntos", icon: Gift, adminOnly: true },

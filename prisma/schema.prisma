@@ -747,7 +747,9 @@ model SiteSetting {
 model Post {
   id          String   @id @default(cuid())
   title       String
+  slug        String?  @unique
   excerpt     String?
+  body        String?  @db.Text
   image       String?
   linkUrl     String?
   published   Boolean  @default(false)

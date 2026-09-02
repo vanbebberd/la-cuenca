@@ -8,14 +8,16 @@ import Image from "next/image";
 interface Post {
   id: string;
   title: string;
+  slug: string | null;
   excerpt: string | null;
+  body: string | null;
   image: string | null;
   linkUrl: string | null;
   published: boolean;
   order: number;
 }
 
-const empty = { title: "", excerpt: "", image: "", linkUrl: "", order: "0" };
+const empty = { title: "", slug: "", excerpt: "", body: "", image: "", linkUrl: "", order: "0" };
 
 export default function PostsAdminPage() {
   const [posts, setPosts] = useState<Post[]>([]);
@@ -103,8 +105,8 @@ export default function PostsAdminPage() {
     <div className="p-6 max-w-3xl">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-xl font-bold text-gray-900">Destacados editoriales</h1>
-          <p className="text-xs text-gray-400 mt-0.5">Las 3 primeras cajas publicadas aparecen en el home</p>
+          <h1 className="text-xl font-bold text-gray-900">Imperdibles</h1>
+          <p className="text-xs text-gray-400 mt-0.5">Notas del blog. Las 3 primeras publicadas salen en el home; todas en /imperdibles</p>
         </div>
       </div>
 
@@ -121,15 +123,22 @@ export default function PostsAdminPage() {
 
       {/* New post form */}
       <div className="bg-white rounded-2xl border border-gray-100 p-5 mb-6">
-        <h2 className="text-sm font-semibold text-gray-700 mb-3">Nueva caja</h2>
+        <h2 className="text-sm font-semibold text-gray-700 mb-3">Nueva nota</h2>
         {error && <p className="text-xs text-red-500 mb-3 bg-red-50 px-3 py-2 rounded-lg">{error}</p>}
         <form onSubmit={handleAdd} className="space-y-3">
-          <Input placeholder="Título *  (ej: La mejor picá de Puerto Varas)" value={form.title} onChange={e => setForm(p => ({ ...p, title: e.target.value }))} required />
+          <Input placeholder="Título *  (ej: Los 5 mejores restaurantes de Puerto Varas)" value={form.title} onChange={e => setForm(p => ({ ...p, title: e.target.value }))} required />
+          <Input placeholder="URL de la nota (se genera del título si lo dejas vacío)" value={form.slug} onChange={e => setForm(p => ({ ...p, slug: e.target.value }))} />
           <textarea
-            placeholder="Texto / descripción (ej: El secreto mejor guardado del centro, descúbrelo acá)"
+            placeholder="Bajada / resumen corto (aparece en la caja del home y en el índice)"
             value={form.excerpt}
             onChange={e => setForm(p => ({ ...p, excerpt: e.target.value }))}
             className="w-full px-3 py-2 text-sm rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 resize-none h-16"
+          />
+          <textarea
+            placeholder="Contenido de la nota — Markdown: # Título, ## Subtítulo, **negrita**, - lista, [texto](link)"
+            value={form.body}
+            onChange={e => setForm(p => ({ ...p, body: e.target.value }))}
+            className="w-full px-3 py-2 text-sm font-mono rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 resize-y h-48"
           />
           <div className="flex gap-2">
             {form.image ? (
@@ -145,13 +154,13 @@ export default function PostsAdminPage() {
             <input ref={fileRefNew} type="file" accept="image/*" className="hidden" onChange={e => { const f = e.target.files?.[0]; if (f) uploadImage(f, url => setForm(p => ({ ...p, image: url })), setUploadingNew); }} />
           </div>
           <div className="flex gap-2">
-            <Input placeholder="Link al hacer click (ej: /events, https://...)" value={form.linkUrl} onChange={e => setForm(p => ({ ...p, linkUrl: e.target.value }))} className="flex-1" />
+            <Input placeholder="Link externo (opcional — si lo pones, la caja lleva ahí en vez de a la nota)" value={form.linkUrl} onChange={e => setForm(p => ({ ...p, linkUrl: e.target.value }))} className="flex-1" />
             <div className="shrink-0 w-20">
               <Input type="number" min="0" placeholder="Orden" value={form.order} onChange={e => setForm(p => ({ ...p, order: e.target.value }))} />
             </div>
           </div>
           <Button type="submit" disabled={adding || !form.title} size="sm" className="w-full gap-1.5">
-            <Plus className="h-4 w-4" />{adding ? "Guardando..." : "Agregar caja"}
+            <Plus className="h-4 w-4" />{adding ? "Guardando..." : "Agregar nota"}
           </Button>
         </form>
       </div>
@@ -179,13 +188,15 @@ function PostRow({ post, onToggle, onDelete, onSave, uploadImage }: {
   uploadImage: (file: File, onUrl: (u: string) => void, setUploading: (v: boolean) => void) => void;
 }) {
   const [editing, setEditing] = useState(false);
-  const [local, setLocal] = useState({ title: post.title, excerpt: post.excerpt ?? "", image: post.image ?? "", linkUrl: post.linkUrl ?? "", order: String(post.order) });
+  const [local, setLocal] = useState({ title: post.title, slug: post.slug ?? "", excerpt: post.excerpt ?? "", body: post.body ?? "", image: post.image ?? "", linkUrl: post.linkUrl ?? "", order: String(post.order) });
   const [uploading, setUploading] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
   function save() {
     onSave(post, "title", local.title);
+    onSave(post, "slug", local.slug);
     onSave(post, "excerpt", local.excerpt);
+    onSave(post, "body", local.body);
     onSave(post, "image", local.image);
     onSave(post, "linkUrl", local.linkUrl);
     onSave(post, "order", local.order);
@@ -197,7 +208,9 @@ function PostRow({ post, onToggle, onDelete, onSave, uploadImage }: {
       {editing ? (
         <div className="space-y-2">
           <Input value={local.title} onChange={e => setLocal(p => ({ ...p, title: e.target.value }))} placeholder="Título" />
-          <textarea value={local.excerpt} onChange={e => setLocal(p => ({ ...p, excerpt: e.target.value }))} className="w-full px-3 py-2 text-sm rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 resize-none h-16" placeholder="Descripción" />
+          <Input value={local.slug} onChange={e => setLocal(p => ({ ...p, slug: e.target.value }))} placeholder="URL de la nota (slug)" />
+          <textarea value={local.excerpt} onChange={e => setLocal(p => ({ ...p, excerpt: e.target.value }))} className="w-full px-3 py-2 text-sm rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 resize-none h-16" placeholder="Bajada / resumen corto" />
+          <textarea value={local.body} onChange={e => setLocal(p => ({ ...p, body: e.target.value }))} className="w-full px-3 py-2 text-sm font-mono rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 resize-y h-48" placeholder="Contenido (Markdown)" />
           <div className="flex gap-2">
             {local.image && (
               <div className="relative h-14 w-20 rounded-xl overflow-hidden shrink-0 bg-gray-100">
@@ -233,9 +246,16 @@ function PostRow({ post, onToggle, onDelete, onSave, uploadImage }: {
               <p className="font-semibold text-sm text-gray-900 truncate">{post.title}</p>
             </div>
             {post.excerpt && <p className="text-xs text-gray-400 line-clamp-1">{post.excerpt}</p>}
-            {post.linkUrl && <p className="text-xs text-blue-400 truncate mt-0.5">{post.linkUrl}</p>}
+            <div className="flex items-center gap-2 mt-0.5">
+              {post.slug && <span className="text-xs text-gray-400 truncate">/imperdibles/{post.slug}</span>}
+              {post.body && <span className="text-[10px] font-semibold text-emerald-600 uppercase">con nota</span>}
+              {post.linkUrl && <span className="text-xs text-blue-400 truncate">↗ {post.linkUrl}</span>}
+            </div>
           </div>
           <div className="flex items-center gap-1 shrink-0">
+            {post.slug && (
+              <a href={`/imperdibles/${post.slug}`} target="_blank" rel="noopener noreferrer" className="text-xs px-2 py-1 rounded-lg border border-gray-200 text-gray-500 bg-gray-50 hover:bg-gray-100 font-medium">Ver</a>
+            )}
             <button onClick={() => onToggle(post)} className={`text-xs px-2 py-1 rounded-lg border font-medium transition-colors ${post.published ? "border-emerald-200 text-emerald-700 bg-emerald-50 hover:bg-emerald-100" : "border-gray-200 text-gray-400 bg-gray-50 hover:bg-gray-100"}`}>
               {post.published ? <Eye className="h-3.5 w-3.5" /> : <EyeOff className="h-3.5 w-3.5" />}
             </button>
