@@ -10,17 +10,13 @@ export const CITIES = [
 export const CATEGORIES = [
   { name: "Restaurantes", slug: "restaurantes", icon: "UtensilsCrossed", color: "#ef4444" },
   { name: "Cafés", slug: "cafes", icon: "Coffee", color: "#92400e" },
+  { name: "Bares y Cervecerías", slug: "bares", icon: "Beer", color: "#f59e0b" },
   { name: "Hoteles", slug: "hoteles", icon: "BedDouble", color: "#3b82f6" },
-  { name: "Bares", slug: "bares", icon: "Beer", color: "#f59e0b" },
-  { name: "Turismo", slug: "turismo", icon: "Map", color: "#10b981" },
-  { name: "Actividades", slug: "actividades", icon: "Activity", color: "#8b5cf6" },
+  { name: "Panoramas y Tours", slug: "panoramas", icon: "Compass", color: "#06b6d4" },
   { name: "Tiendas", slug: "tiendas", icon: "ShoppingBag", color: "#ec4899" },
   { name: "Delivery", slug: "delivery", icon: "Bike", color: "#f97316" },
-  { name: "Cervecerías", slug: "cervecerias", icon: "GlassWater", color: "#d97706" },
-  { name: "Spa & Wellness", slug: "wellness", icon: "Heart", color: "#14b8a6" },
+  { name: "Bienestar", slug: "wellness", icon: "Heart", color: "#14b8a6" },
   { name: "Servicios", slug: "servicios", icon: "Wrench", color: "#6b7280" },
-  { name: "Panoramas", slug: "panoramas", icon: "Camera", color: "#06b6d4" },
-  { name: "Tours", slug: "tours", icon: "Compass", color: "#0ea5e9" },
 ] as const;
 
 export const PRICE_RANGES = [
