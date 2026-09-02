@@ -93,26 +93,26 @@ export default async function HomePage() {
       </section>
 
       {/* ── CATEGORÍAS ───────────────────────────────────────────────────── */}
-      <section className="py-16 bg-white">
+      <section className="py-12 bg-white">
         <div className="max-w-5xl mx-auto px-4">
-          <div className="flex items-center justify-between mb-8">
+          <div className="flex items-center justify-between mb-5">
             <h2 className="text-2xl font-black text-gray-900">{t("by_category", lang)}</h2>
             <Link href="/directory" className="hidden sm:flex items-center gap-1 text-sm font-medium text-gray-400 hover:text-gray-800 transition-colors">
               {t("see_all", lang)} <ArrowRight className="h-3.5 w-3.5" />
             </Link>
           </div>
 
-          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-1">
+          <div className="flex flex-wrap gap-2">
             {CATEGORIES.map((cat) => {
               const Icon = ICON_MAP[cat.icon] ?? Map;
               return (
                 <Link
                   key={cat.slug}
                   href={`/directory?categoria=${cat.slug}`}
-                  className="group flex flex-col items-center gap-2.5 px-3 py-5 rounded-xl hover:bg-gray-50 transition-colors duration-150"
+                  className="group inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white px-3.5 py-2 text-sm font-medium text-gray-600 hover:border-emerald-300 hover:bg-emerald-50 hover:text-emerald-800 transition-colors"
                 >
-                  <Icon className="h-8 w-8 text-emerald-600 group-hover:text-emerald-700 transition-colors" strokeWidth={1.5} />
-                  <span className="text-[11px] font-medium text-gray-500 group-hover:text-gray-800 transition-colors text-center leading-tight">{cat.name}</span>
+                  <Icon className="h-4 w-4 text-emerald-600 shrink-0" strokeWidth={2} />
+                  {cat.name}
                 </Link>
               );
             })}
