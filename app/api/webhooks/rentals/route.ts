@@ -1,9 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { MercadoPagoConfig, Payment } from "mercadopago";
+import { verifyMercadoPagoSignature } from "@/lib/mercadopago";
 
 export async function POST(req: NextRequest) {
   const body = await req.json();
+
+  if (!verifyMercadoPagoSignature(req, body?.data?.id ? String(body.data.id) : undefined)) {
+    return NextResponse.json({ error: "Firma inválida" }, { status: 401 });
+  }
 
   if (body.type !== "payment") return NextResponse.json({ ok: true });
 

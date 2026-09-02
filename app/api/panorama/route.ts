@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
+import { rateLimit, clientIp } from "@/lib/rate-limit";
 
 export const maxDuration = 60;
 
@@ -16,6 +17,14 @@ const schema = z.object({
 
 export async function POST(req: NextRequest) {
   try {
+  const rl = rateLimit(`panorama:${clientIp(req)}`, { limit: 8, windowMs: 60_000 });
+  if (!rl.ok) {
+    return NextResponse.json(
+      { error: "Demasiadas solicitudes, espera un momento" },
+      { status: 429, headers: { "Retry-After": String(rl.retryAfter) } },
+    );
+  }
+
   const body = await req.json();
   const parsed = schema.safeParse(body);
   if (!parsed.success) return NextResponse.json({ error: "Datos inválidos" }, { status: 400 });
@@ -98,7 +107,7 @@ ${businessList || "No hay locales registrados aún, usa lugares conocidos de la 
     return NextResponse.json({ error: msg }, { status: 500 });
   }
 
-  const text = message.content[0].type === "text" ? message.content[0].text : "";
+  const text = message.content[0]?.type === "text" ? message.content[0].text : "";
 
   const jsonMatch = text.match(/\{[\s\S]*\}/);
   if (!jsonMatch) return NextResponse.json({ error: "No se pudo generar el panorama" }, { status: 500 });

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
+import { rateLimit, clientIp } from "@/lib/rate-limit";
 
 export const maxDuration = 60;
 
@@ -15,6 +16,14 @@ const schema = z.object({
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ businessId: string }> }) {
   const { businessId } = await params;
+
+  const rl = rateLimit(`chat:${clientIp(req)}`, { limit: 15, windowMs: 60_000 });
+  if (!rl.ok) {
+    return NextResponse.json(
+      { error: "Demasiados mensajes, espera un momento" },
+      { status: 429, headers: { "Retry-After": String(rl.retryAfter) } },
+    );
+  }
 
   const business = await prisma.business.findUnique({
     where: { id: businessId, status: "ACTIVE" },

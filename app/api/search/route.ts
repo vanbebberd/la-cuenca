@@ -1,12 +1,21 @@
 import { NextRequest, NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
 import { CITIES, CATEGORIES } from "@/lib/constants";
+import { rateLimit, clientIp } from "@/lib/rate-limit";
 
 export const maxDuration = 30;
 
 export async function POST(req: NextRequest) {
+  const rl = rateLimit(`search:${clientIp(req)}`, { limit: 20, windowMs: 60_000 });
+  if (!rl.ok) {
+    return NextResponse.json(
+      { error: "Demasiadas solicitudes" },
+      { status: 429, headers: { "Retry-After": String(rl.retryAfter) } },
+    );
+  }
+
   const { q } = await req.json();
-  if (!q?.trim()) return NextResponse.json({});
+  if (typeof q !== "string" || !q.trim() || q.length > 200) return NextResponse.json({});
 
   if (!process.env.ANTHROPIC_API_KEY) {
     return NextResponse.json({ error: "No configurado" }, { status: 500 });
@@ -36,7 +45,7 @@ JSON de respuesta (usa null si no se menciona):
       }],
     });
 
-    const text = message.content[0].type === "text" ? message.content[0].text : "{}";
+    const text = message.content[0]?.type === "text" ? message.content[0].text : "{}";
     const match = text.match(/\{[\s\S]*?\}/);
     const filters = match ? JSON.parse(match[0]) : {};
 
