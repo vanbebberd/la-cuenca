@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import Link from "next/link";
 import "./globals.css";
 import { Providers } from "@/components/Providers";
 import { Navbar } from "@/components/Navbar";
@@ -38,7 +39,15 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <Providers>
           <Navbar />
           <main>{children}</main>
-          <footer className="border-t border-gray-100 bg-white py-10 mt-8">
+          <div className="bg-emerald-600">
+            <div className="max-w-7xl mx-auto px-4 py-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left">
+              <p className="text-white text-sm font-medium">¿Tienes un negocio en la cuenca? Súmate gratis al directorio.</p>
+              <Link href="/suma-tu-negocio" className="shrink-0 text-xs font-bold bg-white text-emerald-700 px-4 py-2 rounded-full hover:bg-emerald-50 transition-colors">
+                Suma tu negocio →
+              </Link>
+            </div>
+          </div>
+          <footer className="border-t border-gray-100 bg-white py-10">
             <div className="max-w-7xl mx-auto px-4">
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
                 <div>
