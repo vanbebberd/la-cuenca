@@ -41,7 +41,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           <main>{children}</main>
           <div className="bg-emerald-600">
             <div className="max-w-7xl mx-auto px-4 py-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left">
-              <p className="text-white text-sm font-medium">¿Tienes un negocio en la cuenca? Súmate gratis al directorio.</p>
+              <p className="text-white text-sm font-medium">¿Tienes un negocio en la cuenca? Sé de los primeros 100 en sumarte, gratis.</p>
               <Link href="/suma-tu-negocio" className="shrink-0 text-xs font-bold bg-white text-emerald-700 px-4 py-2 rounded-full hover:bg-emerald-50 transition-colors">
                 Suma tu negocio →
               </Link>

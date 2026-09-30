@@ -53,7 +53,7 @@ export function Navbar() {
 
         <div className="hidden md:flex items-center gap-3">
           <LanguageSwitcher />
-          <Link href="/planes">
+          <Link href="/suma-tu-negocio">
             <Button size="sm" variant="outline" className="gap-1.5 border-emerald-200 text-emerald-700 hover:bg-emerald-50">
               {t("nav_join", lang)}
             </Button>
@@ -94,7 +94,7 @@ export function Navbar() {
           )}
           <div className="pt-2 border-t border-gray-100 mt-1 space-y-2">
             <div className="flex justify-center py-1"><LanguageSwitcher /></div>
-            <Link href="/planes" onClick={() => setOpen(false)}>
+            <Link href="/suma-tu-negocio" onClick={() => setOpen(false)}>
               <Button variant="outline" size="sm" className="w-full border-emerald-200 text-emerald-700">{t("nav_join", lang)}</Button>
             </Link>
             {session ? (
