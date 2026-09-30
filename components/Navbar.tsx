@@ -21,13 +21,13 @@ export function Navbar() {
   }, []);
 
   const NAV_LINKS = [
-    { href: "/directory", label: t("nav_explore", lang), icon: MapPin },
-    { href: "/rentals",    label: "Arriendos",              icon: Home },
-    { href: "/activities", label: "Actividades",            icon: Mountain },
-    { href: "/panorama",  label: "Laki",                  icon: Sparkles },
-    { href: "/imperdibles", label: "Imperdibles",         icon: BookOpen },
-    { href: "/events",    label: t("nav_events", lang),   icon: Ticket },
-    { href: "/wallet",    label: t("nav_points", lang),   icon: Gift },
+    { href: "/directory", label: t("nav_explore", lang), icon: MapPin, highlight: false },
+    { href: "/rentals",    label: "Arriendos",              icon: Home, highlight: false },
+    { href: "/activities", label: "Actividades",            icon: Mountain, highlight: false },
+    { href: "/panorama",  label: "L.A.K.I",               icon: Sparkles, highlight: true },
+    { href: "/imperdibles", label: "Imperdibles",         icon: BookOpen, highlight: false },
+    { href: "/events",    label: t("nav_events", lang),   icon: Ticket, highlight: false },
+    { href: "/wallet",    label: t("nav_points", lang),   icon: Gift, highlight: false },
   ];
 
   return (
@@ -39,8 +39,17 @@ export function Navbar() {
 
         {/* Desktop nav */}
         <nav className="hidden md:flex items-center gap-0.5">
-          {NAV_LINKS.map(({ href, label }) => (
-            <Link key={href} href={href} className="px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-colors">
+          {NAV_LINKS.map(({ href, label, icon: Icon, highlight }) => (
+            <Link
+              key={href}
+              href={href}
+              className={
+                highlight
+                  ? "px-3 py-2 rounded-lg text-sm font-bold text-amber-600 hover:bg-amber-50 transition-colors inline-flex items-center gap-1.5"
+                  : "px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-colors"
+              }
+            >
+              {highlight && <Icon className="h-3.5 w-3.5" />}
               {label}
             </Link>
           ))}
@@ -80,9 +89,18 @@ export function Navbar() {
 
       {open && (
         <div className="md:hidden border-t border-gray-100 bg-white px-4 py-3 space-y-0.5">
-          {NAV_LINKS.map(({ href, label, icon: Icon }) => (
-            <Link key={href} href={href} onClick={() => setOpen(false)} className="flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 hover:text-emerald-700 transition-colors">
-              <Icon className="h-4 w-4 text-gray-400" />
+          {NAV_LINKS.map(({ href, label, icon: Icon, highlight }) => (
+            <Link
+              key={href}
+              href={href}
+              onClick={() => setOpen(false)}
+              className={
+                highlight
+                  ? "flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm font-bold text-amber-600 hover:bg-amber-50 transition-colors"
+                  : "flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 hover:text-emerald-700 transition-colors"
+              }
+            >
+              <Icon className={highlight ? "h-4 w-4 text-amber-500" : "h-4 w-4 text-gray-400"} />
               {label}
             </Link>
           ))}
